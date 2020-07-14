@@ -1,9 +1,10 @@
 #content {
   margin-left: auto;
   margin-right: auto;
-  width: 650px;
+  text-align: center;
+  width: 80%;
 }
 
-#greeting-container {
+#quote-container {
   margin-top: 20px;
 }
