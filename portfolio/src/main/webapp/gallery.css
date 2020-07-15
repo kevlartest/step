@@ -53,16 +53,6 @@
     width: 100%;
 }
 
-.currentIndex {
-    color: #ff0000;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 8px 12px;
-    position: absolute;
-    top: 0;
-    -webkit-text-stroke: 0.2px white;
-}
-
 .indicator {
     background-color: #bbb;
     border-radius: 50%;
