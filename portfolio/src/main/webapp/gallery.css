@@ -1,0 +1,93 @@
+* {
+    box-sizing: border-box
+}
+
+.gallery-container {
+    margin: auto;
+    max-width: 1000px;
+    position: relative;
+}
+
+.slides {
+    display: none;
+}
+
+.defaultImage {
+    display: block;
+}
+
+.prev, .next {
+    border-radius: 0 3px 3px 0;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: -22px;
+    padding: 16px;
+    position: absolute;
+    user-select: none;
+    top: 50%;
+    transition: 0.65s;
+    width: auto;
+}
+
+.next {
+    border-radius: 3px 0 0 3px;
+    right: 0;
+}
+
+.next:hover, .prev:hover {
+    background-color: rgba(255, 127, 80, 0.8)
+}
+
+.text {
+    bottom: 8px;
+    color: whitesmoke;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 8px 12px;
+    position: absolute;
+    text-align: center;
+    text-shadow: #FC0 1px 0 10px;
+    -webkit-text-stroke: 0.5px black;
+    width: 100%;
+}
+
+.currentIndex {
+    color: #ff0000;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 12px;
+    position: absolute;
+    top: 0;
+    -webkit-text-stroke: 0.2px white;
+}
+
+.indicator {
+    background-color: #bbb;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-block;
+    height: 15px;
+    margin: 0 2px;
+    transition: background-color 0.65s;
+    width: 15px;
+}
+
+.indicator:hover, .active {
+    background-color: #ff7f50;
+}
+
+.fade {
+    animation-duration: 1s;
+    animation-name: fade;
+}
+
+@keyframes fade {
+    from {
+        opacity: .4
+    }
+    to {
+        opacity: 1
+    }
+}

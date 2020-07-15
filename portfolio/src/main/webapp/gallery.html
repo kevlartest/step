@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>KT's Website</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="gallery.css">
+    <script src="gallery.js"></script>
+  </head>
+  <body>
+    <div id="navbar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="gallery.html" class='active'>Gallery</a></li>
+        </ul>
+    </div>
+
+    <div class="gallery-container">
+
+        <div class="slides fade defaultImage">
+            <div class="currentIndex">1 / 4</div>
+            <img src="images/ireland.jpg" style="width:100%">
+            <div class="text">Ireland</div>
+        </div>
+
+        <div class="slides fade">
+            <div class="currentIndex">2 / 4</div>
+            <img src="images/nature.jpg" style="width:100%">
+            <div class="text">Nature</div>
+        </div>
+
+        <div class="slides fade">
+            <div class="currentIndex">3 / 4</div>
+            <img src="images/google.jpg" style="width:100%">
+            <div class="text">Google</div>
+        </div>
+
+         <div class="slides fade">
+            <div class="currentIndex">4 / 4</div>
+            <img src="images/rome.jpg" style="width:100%">
+            <div class="text">Rome</div>
+        </div>
+
+        <a class="prev" onclick="previousSlide()">&#10094;</a>
+        <a class="next" onclick="nextSlide()">&#10095;</a>
+    </div>
+    <br>
+
+    <!-- Indicators -->
+    <div style="text-align:center">
+        <span class="indicator active" onclick="setSlide(0)"></span>
+        <span class="indicator" onclick="setSlide(1)"></span>
+        <span class="indicator" onclick="setSlide(2)"></span>
+        <span class="indicator" onclick="setSlide(3)"></span>
+    </div>
+
+  </body>
+</html>
