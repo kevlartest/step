@@ -42,14 +42,14 @@
 
 .text {
     bottom: 8px;
-    color: whitesmoke;
+    color: black;
     font-size: 22px;
     font-weight: bold;
     padding: 8px 12px;
     position: absolute;
     text-align: center;
-    text-shadow: #FC0 1px 0 10px;
-    -webkit-text-stroke: 0.5px black;
+    text-shadow: rgb(255, 81, 0) 1px 0 10px;
+
     width: 100%;
 }
 
