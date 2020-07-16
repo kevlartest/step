@@ -33,6 +33,6 @@
     background-color: #ff7f50;
 }
 
-#navbar ul li a.active {
+.current-page {
     background-color: #ff7f50;
 }
