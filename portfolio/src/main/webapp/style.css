@@ -8,3 +8,31 @@
 #quote-container {
   margin-top: 20px;
 }
+
+#navbar ul {
+    background-color: #333;
+    list-style-type: none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+#navbar ul li {
+    float: left;
+}
+
+#navbar ul li a {
+    color: white;
+    display: block;
+    padding: 14px 16px;
+    text-align: center;
+    text-decoration: none;
+}
+
+#navbar ul li a:hover {
+    background-color: #ff7f50;
+}
+
+.current-page {
+    background-color: #ff7f50;
+}
