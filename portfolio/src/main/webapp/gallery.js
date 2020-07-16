@@ -2,6 +2,17 @@ let slideIndex = 0;
 let slides = document.getElementsByClassName("slides");
 let indicators = document.getElementsByClassName("indicator");
 
+function displaySlide(n) {
+    // Loop around if we reach the last slide
+    slideIndex = (n + slides.length) % slides.length;
+
+    Array.from(slides).forEach(slide => slide.style.display = "none");
+    Array.from(indicators).forEach(indicator => indicator.className = indicator.className.replace(" active", ""));
+
+    slides[slideIndex].style.display = "block";
+    indicators[slideIndex].className += " active";
+}
+
 function nextSlide() {
   displaySlide(++slideIndex);
 }
@@ -12,17 +23,6 @@ function previousSlide() {
 
 function setSlide(n) {
   displaySlide(slideIndex = n);
-}
-
-function displaySlide(n) {
-    // Loop around if we reach the last slide
-    slideIndex = (n + slides.length) % slides.length;
-
-    Array.from(slides).forEach(slide => slide.style.display = "none");
-    Array.from(indicators).forEach(indicator => indicator.className = indicator.className.replace(" active", ""));
-
-    slides[slideIndex].style.display = "block";
-    indicators[slideIndex].className += " active";
 }
 
 // Allow interacting with arrow keys
