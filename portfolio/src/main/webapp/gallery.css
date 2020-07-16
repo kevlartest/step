@@ -16,18 +16,18 @@
     display: block;
 }
 
-.prev, .next {
+.prev,
+.next {
     border-radius: 0 3px 3px 0;
     color: white;
     cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
+    font: bold 18px;
     margin-top: -22px;
     padding: 16px;
     position: absolute;
     user-select: none;
     top: 50%;
-    transition: 0.65s;
+    transition: .65s;
     width: auto;
 }
 
@@ -36,15 +36,15 @@
     right: 0;
 }
 
-.next:hover, .prev:hover {
+.next:hover,
+.prev:hover {
     background-color: rgba(255, 127, 80, 0.8)
 }
 
 .text {
     bottom: 8px;
     color: black;
-    font-size: 22px;
-    font-weight: bold;
+    font: bold 22px Arial, sand-serif;
     padding: 8px 12px;
     position: absolute;
     text-align: center;
@@ -60,11 +60,12 @@
     display: inline-block;
     height: 15px;
     margin: 0 2px;
-    transition: background-color 0.65s;
+    transition: background-color .65s;
     width: 15px;
 }
 
-.indicator:hover, .active {
+.indicator:hover,
+.active {
     background-color: #ff7f50;
 }
 
@@ -77,6 +78,7 @@
     from {
         opacity: .4
     }
+
     to {
         opacity: 1
     }
