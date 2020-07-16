@@ -15,12 +15,8 @@ function setSlide(n) {
 }
 
 function displaySlide(n) {
-    if (n >= slides.length){
-        slideIndex = 0
-    }
-    else if (n < 0) {
-        slideIndex = slides.length - 1 // Loop back around
-    }
+    // Loop around if we reach the last slide
+    slideIndex = (n + slides.length) % slides.length;
 
     Array.from(slides).forEach(slide => slide.style.display = "none");
     Array.from(indicators).forEach(indicator => indicator.className = indicator.className.replace(" active", ""));
