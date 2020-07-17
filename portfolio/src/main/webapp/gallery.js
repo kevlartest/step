@@ -36,11 +36,11 @@ document.addEventListener('keydown', function(event) {
         nextSlide();
         break;
 
-        case "ArrowUp":
+        case "Home": case "PageUp":
         setSlide(0);
         break;
 
-        case "ArrowDown":
+        case "End": case "PageDown":
         setSlide(slides.length - 1);
         break;
   }
