@@ -16,7 +16,17 @@
  * Adds a random quote to the page.
  */
 function addRandomQuote() {
-  const quotes = ['Hello there!', 'Ooh, shiny!'];
+  const quotes = [
+    'Hello there!',
+    'Ooh, shiny!',
+    'Curse your sudden but inevitable betrayal!',
+    'Unlimited power!',
+    'I swear by my pretty floral bonnet, I will end you',
+    'I find your lack of faith disturbing',
+    'I am a leaf on the wind. Watch how I soar',
+    'It\'s a trap!',
+    'You were the chosen one!',
+  ];
 
   // Pick a random quote.
   const quote = quotes[Math.floor(Math.random() * quotes.length)];
