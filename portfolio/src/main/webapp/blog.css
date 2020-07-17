@@ -1,0 +1,56 @@
+.blog {
+    padding: 20px;
+    background: whitesmoke;
+}
+
+.header {
+    background: #333;
+    font-size: 20px;
+    padding: 1px;
+    text-align: center;
+}
+
+.header h2 {
+    color: white;
+}
+
+.articles {
+    float: left;
+    width: 100%;
+}
+
+.card {
+    background-color: white;
+    margin-top: 20px;
+    padding: 20px;
+}
+
+.row:after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.card:hover {
+    outline: 5px dotted #ff7f50;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:link {
+    color: black;
+}
+
+a:visited {
+    color: black;
+}
+
+a:hover {
+    color: black;
+}
+
+a:active {
+    color: #ff7f50;
+}
