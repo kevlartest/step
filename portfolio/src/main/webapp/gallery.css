@@ -1,0 +1,85 @@
+* {
+    box-sizing: border-box
+}
+
+.gallery-container {
+    margin: auto;
+    max-width: 1000px;
+    position: relative;
+}
+
+.slides {
+    display: none;
+}
+
+.defaultImage {
+    display: block;
+}
+
+.prev,
+.next {
+    border-radius: 0 3px 3px 0;
+    color: white;
+    cursor: pointer;
+    font: bold 18px;
+    margin-top: -22px;
+    padding: 16px;
+    position: absolute;
+    user-select: none;
+    top: 50%;
+    transition: .65s;
+    width: auto;
+}
+
+.next {
+    border-radius: 3px 0 0 3px;
+    right: 0;
+}
+
+.next:hover,
+.prev:hover {
+    background-color: rgba(255, 127, 80, 0.8)
+}
+
+.text {
+    bottom: 8px;
+    color: black;
+    font: bold 22px Arial, sand-serif;
+    padding: 8px 12px;
+    position: absolute;
+    text-align: center;
+    text-shadow: rgb(255, 81, 0) 1px 0 10px;
+
+    width: 100%;
+}
+
+.indicator {
+    background-color: #bbb;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-block;
+    height: 15px;
+    margin: 0 2px;
+    transition: background-color .65s;
+    width: 15px;
+}
+
+.indicator:hover,
+.active {
+    background-color: #ff7f50;
+}
+
+.fade {
+    animation-duration: 1s;
+    animation-name: fade;
+}
+
+@keyframes fade {
+    from {
+        opacity: .4
+    }
+
+    to {
+        opacity: 1
+    }
+}
