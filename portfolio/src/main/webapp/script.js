@@ -28,10 +28,17 @@ function addRandomQuote() {
     'You were the chosen one!',
   ];
 
-  // Pick a random quote.
-  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    // Pick a random quote, but not the same twice in a row
+    let randomIndex;
+    while(typeof randomIndex === "undefined" || randomIndex === addRandomQuote.previousIndex){
+        randomIndex = Math.floor(Math.random() * quotes.length);
+    }
 
-  // Add it to the page.
-  const quoteContainer = document.getElementById('quote-container');
-  quoteContainer.innerText = quote;
+    addRandomQuote.previousIndex = randomIndex;
+    
+    const quote = quotes[randomIndex];
+
+    // Add it to the page
+    const quoteContainer = document.getElementById('quote-container');
+    quoteContainer.innerText = quote;
 }
