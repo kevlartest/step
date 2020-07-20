@@ -16,14 +16,27 @@
         </ul>
     </div>
     <div id="content">
-      <h1>Kevlar Test's Personal Website</h1>
-      <p>Welcome to the least personal personal website on the net.</p>
-      <p>Stay only for as long as necessary!</p>
-      <img src="/images/kv.jpg" width="200" height="200">
-      <p>My <a href="https://github.com/kevlartest">GitHub</a> account</p>
-      <p>Click the button below to receive a random quote:</p>
-      <button onclick="addRandomQuote()">Quote Me Up!</button>
-      <div id="quote-container"></div>
+        <h1>Kevlar Test's Personal Website</h1>
+        <p>Welcome to the least personal personal website on the net.</p>
+        <p>Stay only for as long as necessary!</p>
+        <img src="/images/kv.jpg" width="200" height="200">
+        <p>My <a href="https://github.com/kevlartest">GitHub</a> account</p>
+        <p>Click the button below to receive a random quote:</p>
+        <button onclick="addRandomQuote()">Quote Me Up!</button>
+        <div id="quote-container"></div>
+
+        <hr>
+        <form action="/comments" method="POST">
+            <h3>Add a Comment:</h3>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email"><br/>
+            <label for="body">Comment:</label>
+            <input type="text" id ="body" name="body">
+            <br/><br/>
+
+            <input type="submit" />
+        </form>
+
     </div>
   </body>
 </html>
