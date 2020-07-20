@@ -30,7 +30,7 @@ function addRandomQuote() {
 
     // Pick a random quote, but not the same twice in a row
     let randomIndex;
-    while(typeof randomIndex === "undefined" || randomIndex === addRandomQuote.previousIndex){
+    while(typeof randomIndex === 'undefined' || randomIndex === addRandomQuote.previousIndex){
         randomIndex = Math.floor(Math.random() * quotes.length);
     }
 
