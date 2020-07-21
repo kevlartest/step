@@ -14,7 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.sps.data.Comment;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/comments")
 public class CommentsServlet extends HttpServlet {
 
-  private Map<String,String> comments;
+  private Map<String,List<Comment>> comments;
 
     @Override
     public void init() {
@@ -37,12 +39,19 @@ public class CommentsServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String email = request.getParameter("email");
-        String body = request.getParameter("body");
+        final String email = request.getParameter("email");
+        final String body = request.getParameter("body");
+        final Instant timestamp = Instant.now();
 
-        System.out.println("Email: " + email + " Comment: " + body);
+        final Comment comment = new Comment(email,body,timestamp);
 
-        comments.put(email,body);
+        System.out.println("Timestamp: " + timestamp + " Email: " + email + " Comment: " + body);
+
+        if(!comments.containsKey(email)){
+            comments.put(email, new ArrayList<>());
+        }
+
+        comments.get(email).add(comment);
 
         response.sendRedirect("/index.html");
     }
