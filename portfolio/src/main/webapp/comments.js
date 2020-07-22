@@ -11,13 +11,14 @@ function createCommentElement(comment) {
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
 
-    const timestamp = new Date();
-    timestamp.setUTCMilliseconds(comment.timestamp.seconds);
+    // Convert UNIX seconds to milliseconds
+    const timestamp = new Date(comment.timestamp.seconds * 1000);
     
     // Long format the timestamp (e.g. Sunday 9 August 2020, 04:06)
-    const options = { hour: 'numeric', minute: 'numeric', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
     const formattedTimestamp = timestamp.toLocaleDateString('en-IE', options);
 
+    // Create a comment heading containing the email address and timestamp
     const commentHeading = document.createElement('p');
 
     const emailElement = document.createElement('span');
@@ -31,6 +32,7 @@ function createCommentElement(comment) {
     commentHeading.appendChild(emailElement);
     commentHeading.appendChild(timestampElement);
 
+    // Comment body with the actual text
     const bodyElement = document.createElement('p');
     bodyElement.className = 'commentBody';
     bodyElement.innerText = comment.body;
