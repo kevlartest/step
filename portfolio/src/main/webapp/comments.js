@@ -1,10 +1,9 @@
-function loadComments() {
-    fetch('/list-comments').then(response => response.json()).then((comments) => {
-        const commentListElement = document.getElementById('comments-list');
-        comments.forEach((comment) => {
-            commentListElement.appendChild(createCommentElement(comment));
-        })
-    });
+async function loadComments(amount = 5){
+    const request = await fetch('/list-comments?amount=' + amount);
+    const comments = await request.json();
+    const commentListElement = document.getElementById('comments-list');
+    commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
+    comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment)));
 }
 
 function createCommentElement(comment) {
