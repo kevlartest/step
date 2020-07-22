@@ -1,0 +1,32 @@
+#comments-list {
+    text-align: center;
+}
+
+.comment {
+    background: #F9F3EC;
+    border-radius: 2em;
+    border: grey dashed;
+    display: block;
+    list-style-type: none;
+    margin: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 50%;
+    padding: 0;
+}
+
+.commentEmail {
+    font-weight: bold;
+    margin: 10px;
+}
+
+.commentTimestamp {
+    font-style: italic;
+    margin: 10px;
+}
+
+.commentBody {
+    margin: 10px;
+    overflow-wrap: break-word;
+    text-align: center;
+}
