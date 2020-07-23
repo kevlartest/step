@@ -1,19 +1,21 @@
 async function loadComments(amount){
-    console.log("amount",amount);
-    // keep the previous amount if a new one is not specified
 
-    const previousDefined = typeof loadComments.amount !== 'undefined';
-    const currentDefined = typeof amount !== 'undefined';
-
-    if(!previousDefined){
-        loadComments.amount = currentDefined ? amount : 5;
-    } else if(currentDefined){
-        loadComments.amount = amount;
+    // Load stored comments amount value, if present
+    let commentsAmount = sessionStorage.getItem("commentsAmount");
+    if(typeof amount !== 'undefined'){
+        commentsAmount = amount;
+    }
+    else if(commentsAmount == null){
+        commentsAmount = 5;
     }
 
-    console.log("loadComments amount", loadComments.amount);
+    // Store comments amount
+    sessionStorage.setItem("commentsAmount", commentsAmount);
 
-    const request = await fetch('/list-comments?amount=' + loadComments.amount);
+    // Set dropdown to value, so on reloading they're not out of sync
+    document.getElementById('comment-amount').value = commentsAmount;
+
+    const request = await fetch('/list-comments?amount=' + commentsAmount);
     const comments = await request.json();
     const commentListElement = document.getElementById('comments-list');
     commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
