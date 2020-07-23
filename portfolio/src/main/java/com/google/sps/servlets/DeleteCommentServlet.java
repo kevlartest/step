@@ -30,8 +30,5 @@ public class DeleteCommentServlet extends HttpServlet {
             e.printStackTrace();
             response.setStatus(500); // Internal server error
       }
-
-
-
   }
 }
