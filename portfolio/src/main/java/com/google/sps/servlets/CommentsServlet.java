@@ -47,7 +47,8 @@ public class CommentsServlet extends HttpServlet {
         final String body = request.getParameter("body");
         final Instant timestamp = Instant.now();
 
-        final Comment comment = new Comment(email,body,timestamp);
+        // The id will be assigned by the database so we set it to 0 here
+        final Comment comment = new Comment(0L,email,body,timestamp);
 
         System.out.println("Timestamp: " + timestamp + " Email: " + email + " Comment: " + body);
 

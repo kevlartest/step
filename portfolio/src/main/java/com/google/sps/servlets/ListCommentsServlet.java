@@ -37,7 +37,7 @@ public class ListCommentsServlet extends HttpServlet {
         final String body = (String) entity.getProperty("body");
         final Instant timestamp = Instant.parse((String) entity.getProperty("timestamp"));
 
-        return new Comment(email,body,timestamp);
+        return new Comment(id,email,body,timestamp);
     }).collect(Collectors.toList());
 
     Gson gson = new Gson();
