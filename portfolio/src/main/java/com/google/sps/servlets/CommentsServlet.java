@@ -45,16 +45,21 @@ public class CommentsServlet extends HttpServlet {
 
         final String email = request.getParameter("email");
         final String body = request.getParameter("body");
-        final Instant timestamp = Instant.now();
 
-        // The id will be assigned by the database so we set it to 0 here
-        final Comment comment = new Comment(0L,email,body,timestamp);
+        // Don't store a blank comment, or one where body < 15 characters
+        if(email != null && body != null && !email.isEmpty() && !body.isEmpty() && body.length() >= 15) {
 
-        System.out.println("Timestamp: " + timestamp + " Email: " + email + " Comment: " + body);
+            final Instant timestamp = Instant.now();
 
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        datastore.put(comment.toDatastoreEntity());
+            // The id will be assigned by the database so we set it to 0 here
+            final Comment comment = new Comment(0L,email,body,timestamp);
 
+            System.out.println("Timestamp: " + timestamp + " Email: " + email + " Comment: " + body);
+
+            DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+            datastore.put(comment.toDatastoreEntity());
+
+        }
         response.sendRedirect("/index.html");
     }
 }

@@ -75,3 +75,10 @@ function deleteComment(comment) {
             if(response.status === 200) loadComments()
         });
 }
+
+// Disable submit button if body length < 15 characters
+function validateComment(){
+    const form = document.getElementById('comment-form');
+    const bodyLength = form.body.value.length;
+    document.getElementById('submit-button').disabled = (bodyLength < 15);
+}
