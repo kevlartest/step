@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <title>KT's Website</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="comments.css">
     <script src="script.js"></script>
+    <script src="comments.js"></script>
   </head>
-  <body>
+  <body onload="loadComments()">
     <div id="navbar">
         <ul>
             <li><a href="index.html" class="current-page">Home</a></li>
@@ -37,6 +39,10 @@
 
             <input type="submit" />
         </form>
+
+        <hr>
+
+        <ul id="comments-list"></ul>
 
     </div>
   </body>

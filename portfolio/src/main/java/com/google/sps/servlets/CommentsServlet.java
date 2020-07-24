@@ -14,7 +14,11 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import com.google.sps.data.Comment;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -47,11 +51,8 @@ public class CommentsServlet extends HttpServlet {
 
         System.out.println("Timestamp: " + timestamp + " Email: " + email + " Comment: " + body);
 
-        if(!comments.containsKey(email)){
-            comments.put(email, new ArrayList<>());
-        }
-
-        comments.get(email).add(comment);
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        datastore.put(comment.toDatastoreEntity());
 
         response.sendRedirect("/index.html");
     }
