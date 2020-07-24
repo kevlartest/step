@@ -48,6 +48,7 @@ public class CommentsServlet extends HttpServlet {
 
         final String email = request.getParameter("email");
         final String body = request.getParameter("body");
+
         if(email == null || body == null){
             System.err.println("Comment email or body are null!");
             return;
