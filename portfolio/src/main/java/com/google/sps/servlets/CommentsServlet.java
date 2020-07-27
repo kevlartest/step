@@ -52,7 +52,8 @@ public class CommentsServlet extends HttpServlet {
 
             final Instant timestamp = Instant.now();
 
-            // The id will be assigned by the database so we set it to 0 here
+            // The unique id will be assigned by the database so we set it to 0 here
+            // Comment here is only being used to convert the data using toDatastoreEntity()
             final Comment comment = new Comment(0L,email,body,timestamp);
 
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
