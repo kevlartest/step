@@ -101,3 +101,12 @@ function validateComment(){
     const bodyLength = form.body.value.length;
     document.getElementById('submit-button').disabled = (bodyLength < 15 || bodyLength > 2000);
 }
+
+// Fetch comment form if user is logged in, otherwise ask to login
+async function doLogin(){
+    const formRequest = await fetch('/login');
+    const text = await formRequest.text();
+    var element = document.createElement('html');
+    element.innerHTML = text;
+    document.getElementById('comment-form-div').appendChild(element);
+}
