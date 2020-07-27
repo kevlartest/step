@@ -72,6 +72,7 @@ function createCommentElement(comment, loginData) {
     // Only show delete button if comment was made by logged-in user, or they're an admin
     if(loginData.isUserAdmin || (loginData.loggedIn && loginData.email === comment.email)){
         const deleteButtonElement = document.createElement('button');
+        deleteButtonElement.className = 'deleteButton';
         deleteButtonElement.innerText = 'Delete';
         deleteButtonElement.addEventListener('click', () => {
             deleteComment(comment)
