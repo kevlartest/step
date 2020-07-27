@@ -21,12 +21,15 @@ public class CommentsForm extends HttpServlet {
     UserService userService = UserServiceFactory.getUserService();
     if (userService.isUserLoggedIn()) {
 
+        String email = userService.getCurrentUser().getEmail();
+        request.setAttribute("email", email);
+
         String logoutUrl = userService.createLogoutURL("/");
 
         out.println("<form id=\"comment-form\" action=\"/comments\" method=\"POST\">");
         out.println("<h3>Add a comment or <a href=\"" + logoutUrl + "\">logout</a>:</h3>");
         out.println("<label for=\"email\">Email:</label>");
-        out.println("<input type=\"email\" id=\"email\" name=\"email\" readonly=\"readonly\" value=\"" + userService.getCurrentUser().getEmail() + "\">");
+        out.println("<input type=\"email\" id=\"email\" name=\"email\" readonly=\"readonly\" value=\"" + email + "\">");
         out.println("<br><br>");
         out.println("<label for=\"body\">Comment:</label>");
         out.println("<input type=\"text\" id=\"body\" name=\"body\" onkeyup=\"validateComment()\">");

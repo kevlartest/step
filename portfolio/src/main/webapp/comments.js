@@ -22,23 +22,29 @@ async function loadComments(amount){
     // Set dropdown to value, so on reloading they're not out of sync
     document.getElementById('comment-amount').value = commentsAmount;
 
-    const comments = await (await fetch('/list-comments?amount=' + commentsAmount)).json()
+    const [comments, loginData] = await Promise.all([
+        await (await fetch('/list-comments?amount=' + commentsAmount)).json(),
+         await getLoginData()
+        ])
         .catch(e => {
             alert("There was a problem fetching comments! Please refresh the page");
             console.log(e);
         });
 
+    console.log("LOGINDATA",loginData);
+
     const commentListElement = document.getElementById('comments-list');
     commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
-    comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment)));
+    comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment, loginData)));
 }
 
 /**
  * Creates the HTML list element that contains a single comment, including author, timestamp, body and delete button
  * @param {Object} comment A comment as fetched from datastore, including email, body and timestamp
+ * @param {Object} loginData The user login data, i.e. whether they're logged in, an admin, and their email
  * @return {HTMLLIElement} The HTML list element that contains the comment to be displayed
  */
-function createCommentElement(comment) {
+function createCommentElement(comment, loginData) {
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
 
@@ -60,20 +66,23 @@ function createCommentElement(comment) {
     timestampElement.className = 'commentTimestamp';
     timestampElement.innerText = formattedTimestamp;
 
-    const deleteButtonElement = document.createElement('button');
-    deleteButtonElement.innerText = 'Delete';
-    deleteButtonElement.addEventListener('click', () => {
-        deleteComment(comment)
-        .then(() => { // If deleted successfully
-            commentElement.remove();
-            loadComments();
-        })
-        .catch(e => alert(e));
-    });
-
     commentHeading.appendChild(emailElement);
     commentHeading.appendChild(timestampElement);
-    commentHeading.appendChild(deleteButtonElement);
+
+    // Only show delete button if comment was made by logged-in user, or they're an admin
+    if(loginData.isUserAdmin || (loginData.loggedIn && loginData.email === comment.email)){
+        const deleteButtonElement = document.createElement('button');
+        deleteButtonElement.innerText = 'Delete';
+        deleteButtonElement.addEventListener('click', () => {
+            deleteComment(comment)
+            .then(() => { // If deleted successfully
+                commentElement.remove();
+                loadComments();
+            })
+            .catch(e => alert(e));
+        });
+        commentHeading.appendChild(deleteButtonElement);
+    }
 
     // Comment body with the actual text
     const bodyElement = document.createElement('p');
@@ -109,4 +118,13 @@ async function doLogin(){
     var element = document.createElement('html');
     element.innerHTML = text;
     document.getElementById('comment-form-div').appendChild(element);
+
+    getLoginData();
+}
+
+// Get whether user is logged in, and their email
+// i.e. { "isLoggedIn": true, "email": "john@example.com" }
+async function getLoginData(){
+    const request = await fetch('/logindata');
+    return await request.json();
 }
