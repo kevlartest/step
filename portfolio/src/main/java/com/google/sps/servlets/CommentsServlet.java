@@ -43,8 +43,9 @@ public class CommentsServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        final String email = request.getParameter("email");
-        final String body = request.getParameter("body");
+        // Trim strings to prevent submitting effectively empty fields
+        final String email = request.getParameter("email").trim();
+        final String body = request.getParameter("body").trim();
 
         // Don't store a blank comment, or one where body < 15 characters
         if(email != null && body != null && !email.isEmpty() && !body.isEmpty() && body.length() >= 15) {
