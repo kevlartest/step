@@ -1,15 +1,22 @@
+/**
+ * Load comments from datastore and insert them in the webpage
+ * @param {number} amount The maximum amount of comments to fetch and display
+ */
 async function loadComments(amount){
 
-    // Load stored comments amount value, if present
+    // Make sure selected comments amount is kept even when page reloads after submitting a comment:
+    // Load previous comments amount value from browser cookies
     let commentsAmount = sessionStorage.getItem("commentsAmount");
+
+    // If an amount was specified with the function, use that amount and store it
     if(typeof amount !== 'undefined'){
         commentsAmount = amount;
     }
+    // Otherwise, if no amount was specified and none was stored, set the default value of 5
     else if(commentsAmount == null){
         commentsAmount = 5;
     }
 
-    // Store comments amount
     sessionStorage.setItem("commentsAmount", commentsAmount);
 
     // Set dropdown to value, so on reloading they're not out of sync
@@ -22,6 +29,11 @@ async function loadComments(amount){
     comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment)));
 }
 
+/**
+ * Creates the HTML list element that contains a single comment, including author, timestamp, body and delete button
+ * @param {Object} comment A comment as fetched from datastore, including email, body and timestamp
+ * @return {HTMLLIElement} The HTML list element that contains the comment to be displayed
+ */
 function createCommentElement(comment) {
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
