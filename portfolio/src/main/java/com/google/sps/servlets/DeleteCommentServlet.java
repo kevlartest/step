@@ -15,14 +15,21 @@ public class DeleteCommentServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    long id = Long.parseLong(request.getParameter("id"));
+      response.setContentType("text/xml");
 
-    Key taskEntityKey = KeyFactory.createKey("Comment", id);
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.delete(taskEntityKey);
+      try {
+            long id = Long.parseLong(request.getParameter("id"));
 
-    // Send a success response
-    response.setStatus(200);
-    response.setContentType("text/xml");
+            Key taskEntityKey = KeyFactory.createKey("Comment", id);
+            DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+            datastore.delete(taskEntityKey);
+
+            response.setStatus(200);
+      } catch(Exception e){
+          response.setStatus(400);
+      }
+
+
+
   }
 }
