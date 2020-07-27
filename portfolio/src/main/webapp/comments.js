@@ -59,8 +59,12 @@ function createCommentElement(comment) {
     const deleteButtonElement = document.createElement('button');
     deleteButtonElement.innerText = 'Delete';
     deleteButtonElement.addEventListener('click', () => {
-        deleteComment(comment);
-        commentElement.remove(); // Remove this comment element
+        deleteComment(comment)
+        .then(() => { // If deleted successfully
+            commentElement.remove();
+            loadComments();
+        })
+        .catch(e => alert(e));
     });
 
     commentHeading.appendChild(emailElement);
@@ -78,14 +82,13 @@ function createCommentElement(comment) {
     return commentElement;
 }
 
-function deleteComment(comment) {
+async function deleteComment(comment) {
     const args = new URLSearchParams();
     args.append('id', comment.id);
-    fetch('/delete-comment', {method: 'POST', body: args})
-        .then(response => {
-            // Reload the comments only after this one has been deleted
-            if(response.status === 200) loadComments()
-        });
+    const response = await fetch('/delete-comment', {method: 'POST', body: args})
+
+    if(response.status === 200) return;
+    else throw('There was a problem deleting the comment!');
 }
 
 // Disable submit button if body length < 15 characters
