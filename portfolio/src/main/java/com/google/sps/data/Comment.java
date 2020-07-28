@@ -17,6 +17,16 @@ public class Comment {
         this.timestamp = timestamp;
     }
 
+    /**
+     * Constructor used when entity has not been persisted yet, and thus has no ID
+     */
+    public Comment(String email, String body, Instant timestamp){
+        this.id = 0L;
+        this.email = email;
+        this.body = body;
+        this.timestamp = timestamp;
+    }
+
     public long getId(){
         return id;
     }
