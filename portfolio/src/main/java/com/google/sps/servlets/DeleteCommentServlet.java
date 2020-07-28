@@ -24,9 +24,11 @@ public class DeleteCommentServlet extends HttpServlet {
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
             datastore.delete(taskEntityKey);
 
-            response.setStatus(200);
+            response.setStatus(200); // Successfully deleted
       } catch(Exception e){
-          response.setStatus(400);
+            System.err.println("There was an error deleting the comment!");
+            e.printStackTrace();
+            response.setStatus(500); // Internal server error
       }
 
 
