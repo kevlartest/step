@@ -24,7 +24,8 @@ public class ListCommentsServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    int amount = Integer.parseInt(request.getParameter("amount"));
+    final String amountParameter = request.getParameter("amount");
+    final int amount = (amountParameter == null) ? 5 : Integer.parseInt(amountParameter); // Default to 5
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
