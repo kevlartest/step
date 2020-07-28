@@ -43,19 +43,25 @@ public class CommentsServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        // Not acceptable by default
-        response.setStatus(406);
+        // Bad request by default
+        response.setStatus(400);
 
         final String email = request.getParameter("email");
         final String body = request.getParameter("body");
-        if(email == null || body == null) return;
+        if(email == null || body == null){
+            System.err.println("Comment email or body are null!");
+            return;
+        }
 
         // Trim strings to prevent submitting effectively empty fields
         email.trim();
         body.trim();
 
-        // Don't store a blank comment, or one where body < 15 characters
-        if(email.isEmpty() || body.isEmpty() || body.length() < 15) return;
+        // Don't store a blank comment, or one where body isn't > 15 and < 2000 characters
+        if(email.isEmpty() || body.isEmpty() || body.length() < 15 || body.length() > 2000){
+            System.err.println("Comment email or body are effectively empty!");
+            return;
+        }
 
         final Instant timestamp = Instant.now();
 
@@ -66,7 +72,7 @@ public class CommentsServlet extends HttpServlet {
         try {
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
             datastore.put(comment.toDatastoreEntity());
-            response.setStatus(200);
+            response.setStatus(200); // Successfully stored
             response.sendRedirect("/index.html");
         } catch (Exception e){
             response.setStatus(500); // Internal server error

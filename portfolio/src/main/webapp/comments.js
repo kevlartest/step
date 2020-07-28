@@ -95,5 +95,5 @@ async function deleteComment(comment) {
 function validateComment(){
     const form = document.getElementById('comment-form');
     const bodyLength = form.body.value.length;
-    document.getElementById('submit-button').disabled = (bodyLength < 15);
+    document.getElementById('submit-button').disabled = (bodyLength < 15 || bodyLength > 2000);
 }
