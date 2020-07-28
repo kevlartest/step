@@ -6,7 +6,8 @@ import com.google.appengine.api.datastore.Entity;
 
 public class Comment {
     private final long id;
-    private final String email, body;
+    private final String email;
+    private final String body;
     private final Instant timestamp;
 
     public Comment(long id, String email, String body, Instant timestamp){
