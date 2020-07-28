@@ -43,23 +43,35 @@ public class CommentsServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        // Not acceptable by default
+        response.setStatus(406);
+
+        final String email = request.getParameter("email");
+        final String body = request.getParameter("body");
+        if(email == null || body == null) return;
+
         // Trim strings to prevent submitting effectively empty fields
-        final String email = request.getParameter("email").trim();
-        final String body = request.getParameter("body").trim();
+        email.trim();
+        body.trim();
 
         // Don't store a blank comment, or one where body < 15 characters
-        if(email != null && body != null && !email.isEmpty() && !body.isEmpty() && body.length() >= 15) {
+        if(email.isEmpty() || body.isEmpty() || body.length() < 15) return;
 
-            final Instant timestamp = Instant.now();
+        final Instant timestamp = Instant.now();
 
-            // The unique id will be assigned by the database so we set it to 0 here
-            // Comment here is only being used to convert the data using toDatastoreEntity()
-            final Comment comment = new Comment(0L,email,body,timestamp);
+        // The unique id will be assigned by the database so we set it to 0 here
+        // Comment here is only being used to convert the data using toDatastoreEntity()
+        final Comment comment = new Comment(0L,email,body,timestamp);
 
+        try {
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
             datastore.put(comment.toDatastoreEntity());
-
+            response.setStatus(200);
+            response.sendRedirect("/index.html");
+        } catch (Exception e){
+            response.setStatus(500); // Internal server error
+            System.err.println("There was an error storing the comment!");
+            e.printStackTrace();
         }
-        response.sendRedirect("/index.html");
     }
 }
