@@ -43,23 +43,37 @@ public class NicknameServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.setStatus(400); // Default to bad request
+
     UserService userService = UserServiceFactory.getUserService();
     if (!userService.isUserLoggedIn()) {
-      response.sendRedirect("/nickname");
-      return;
+        response.setStatus(401); // Unauthenticated
+        return;
     }
 
-    String nickname = request.getParameter("nickname");
-    String id = userService.getCurrentUser().getUserId();
+    try {
+        final String nickname = request.getParameter("nickname");
+        final String userId = userService.getCurrentUser().getUserId();
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity entity = new Entity("UserInfo", id);
-    entity.setProperty("id", id);
-    entity.setProperty("nickname", nickname);
-    // The put() function automatically inserts new data or updates existing data based on ID
-    datastore.put(entity);
+        if(nickname == null){
+            System.err.println("Nickname is null for userId: " + userId);
+            return;
+        }
+        if(userId == null){
+            System.err.println("UserId is null");
+            return;
+        }
 
-    response.sendRedirect("/");
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        Entity entity = new Entity("UserInfo", userId);
+        entity.setProperty("id", userId);
+        entity.setProperty("nickname", nickname);
+        datastore.put(entity);
+
+        response.sendRedirect("/");
+    } catch (Exception e){
+        System.err.println("There was an error setting a nickname for " + userId);
+    }
   }
 
   /**
