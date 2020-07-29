@@ -5,15 +5,31 @@ import java.time.temporal.ChronoUnit;
 import com.google.appengine.api.datastore.Entity;
 
 public class Comment {
-    private final String email, body;
+    private final long id;
+    private final String email;
+    private final String body;
     private final Instant timestamp;
 
-    public Comment(String email, String body, Instant timestamp){
+    public Comment(long id, String email, String body, Instant timestamp){
+        this.id = id;
         this.email = email;
         this.body = body;
         this.timestamp = timestamp;
     }
 
+    /**
+     * Constructor used when entity has not been persisted yet, and thus has no ID
+     */
+    public Comment(String email, String body, Instant timestamp){
+        this.id = 0L;
+        this.email = email;
+        this.body = body;
+        this.timestamp = timestamp;
+    }
+
+    public long getId(){
+        return id;
+    }
     public String getEmail(){
         return email;
     }

@@ -3,6 +3,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,23 +24,22 @@ public class ListCommentsServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    final String amountParameter = request.getParameter("amount");
+    final int amount = (amountParameter == null) ? 5 : Integer.parseInt(amountParameter); // Default to 5
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
-    List<Comment> comments = new ArrayList<>();
+    List<Comment> comments = results.asList(FetchOptions.Builder.withLimit(amount))
+    .stream().map(entity -> {
+        final long id = entity.getKey().getId();
+        final String email = (String) entity.getProperty("email");
+        final String body = (String) entity.getProperty("body");
+        final Instant timestamp = Instant.parse((String) entity.getProperty("timestamp"));
 
-    for (Entity entity : results.asIterable()) {
-      long id = entity.getKey().getId();
-      String email = (String) entity.getProperty("email");
-      String body = (String) entity.getProperty("body");
-      Instant timestamp = Instant.parse((String) entity.getProperty("timestamp"));
-
-      Comment comment = new Comment(email,body,timestamp);
-
-      comments.add(comment);
-    }
+        return new Comment(id,email,body,timestamp);
+    }).collect(Collectors.toList());
 
     Gson gson = new Gson();
 

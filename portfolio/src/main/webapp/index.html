@@ -28,19 +28,32 @@
         <div id="quote-container"></div>
 
         <hr>
-        <form action="/comments" method="POST">
+        <form id="comment-form" action="/comments" method="POST">
             <h3>Add a Comment:</h3>
             <label for="email">Email:</label>
             <input type="email" id="email" name="email">
             <br><br>
             <label for="body">Comment:</label>
-            <input type="text" id="body" name="body">
+            <input type="text" id="body" name="body" onkeyup="validateComment()">
             <br><br>
 
-            <input type="submit" />
+            <input id="submit-button" type="submit" disabled="true"/>
         </form>
 
         <hr>
+        <h3>Comments</h3>
+        <label for="comment-amount">Display amount:</label>
+
+        <select name="comment-amount" id="comment-amount" onchange="loadComments(this.options[this.selectedIndex].value)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="500">500</option>
+        </select>
 
         <ul id="comments-list"></ul>
 
