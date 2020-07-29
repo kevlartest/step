@@ -17,6 +17,8 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.sps.data.Comment;
 
 import java.io.IOException;
@@ -46,28 +48,40 @@ public class CommentsServlet extends HttpServlet {
         // Bad request by default
         response.setStatus(400);
 
-        final String email = request.getParameter("email");
+        final UserService userService = UserServiceFactory.getUserService();
+        if (!userService.isUserLoggedIn()) {
+            System.err.println("User is not logged in!");
+            response.setStatus(401); // Unauthenticated
+            return;
+        }
+
+        final String userId = userService.getCurrentUser().getUserId();
         final String body = request.getParameter("body");
 
-        if(email == null || body == null){
-            System.err.println("Comment email or body are null!");
+        if(userId == null){
+            System.err.println("Comment userId is null");
+            return;
+        }
+
+        if(body == null){
+            System.err.println("Comment body is null");
             return;
         }
 
         // Trim strings to prevent submitting effectively empty fields
-        email.trim();
+        userId.trim();
         body.trim();
 
         // Don't store a blank comment, or one where body isn't > 15 and < 2000 characters
-        if(email.isEmpty() || body.isEmpty() || body.length() < 15 || body.length() > 2000){
-            System.err.println("Comment email or body are effectively empty!");
+        if(userId.isEmpty() || body.isEmpty() || body.length() < 15 || body.length() > 2000){
+            System.err.println("Comment userId or body are effectively empty!");
             return;
         }
 
         final Instant timestamp = Instant.now();
 
         // Comment instance here is only being used to convert the data using toDatastoreEntity()
-        final Comment comment = new Comment(email,body,timestamp);
+        final Comment comment = new Comment(userId,body,timestamp);
 
         try {
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

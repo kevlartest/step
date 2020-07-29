@@ -21,8 +21,8 @@ public class LoginData extends HttpServlet {
 
     final boolean isLoggedIn = userService.isUserLoggedIn();
     final boolean isUserAdmin = isLoggedIn ? userService.isUserAdmin() : false;
-    final String email = isLoggedIn ? userService.getCurrentUser().getEmail() : "";
+    final String userId = isLoggedIn ? userService.getCurrentUser().getUserId() : "";
 
-    response.getWriter().println("{ \"loggedIn\": " + isLoggedIn + ", \"email\": \"" + email + "\", \"isUserAdmin\": " + isUserAdmin + " }");
+    response.getWriter().println("{ \"loggedIn\": " + isLoggedIn + ", \"userId\": \"" + userId + "\", \"isUserAdmin\": " + isUserAdmin + " }");
   }
 }

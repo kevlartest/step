@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
 import com.google.sps.data.Comment;
+import com.google.sps.servlets.CommentsForm;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,12 +34,12 @@ public class ListCommentsServlet extends HttpServlet {
 
     List<Comment> comments = results.asList(FetchOptions.Builder.withLimit(amount))
     .stream().map(entity -> {
-        final long id = entity.getKey().getId();
-        final String email = (String) entity.getProperty("email");
+        final long commentId = entity.getKey().getId();
+        final String userId = (String) entity.getProperty("userId");
         final String body = (String) entity.getProperty("body");
         final Instant timestamp = Instant.parse((String) entity.getProperty("timestamp"));
 
-        return new Comment(id,email,body,timestamp);
+        return new Comment(commentId,userId,body,timestamp);
     }).collect(Collectors.toList());
 
     Gson gson = new Gson();

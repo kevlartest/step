@@ -40,11 +40,11 @@ public class DeleteCommentServlet extends HttpServlet {
         commentEntity = datastore.get(commentEntityKey);
 
         // Only delete comment if user is author or is admin
-        final String commentEmail = (String) commentEntity.getProperty("email");
+        final String commentUserId = (String) commentEntity.getProperty("userId");
         final boolean isUserAdmin = userService.isUserAdmin();
-        final String email = userService.getCurrentUser().getEmail();
+        final String userId = userService.getCurrentUser().getUserId();
 
-        if(!isUserAdmin && !commentEmail.equalsIgnoreCase(email)){
+        if(!isUserAdmin && !commentUserId.equalsIgnoreCase(userId)){
             System.err.println("User is not author or admin!");
             return;
         }
