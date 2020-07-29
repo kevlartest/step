@@ -72,7 +72,7 @@ public class NicknameServlet extends HttpServlet {
 
         response.sendRedirect("/");
     } catch (Exception e){
-        System.err.println("There was an error setting a nickname for " + userId);
+        System.err.println("There was an error setting a nickname");
     }
   }
 
