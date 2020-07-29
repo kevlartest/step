@@ -149,3 +149,10 @@ async function getLoginData(){
     const request = await fetch('/logindata');
     return await request.json();
 }
+
+// Disable nickname form if conditions are not met
+function validateNickname(){
+    const form = document.getElementById('nickname-form');
+    const nickname = form.nickname.value.length;
+    document.getElementById('nickname-submit-button').disabled = (nickname < 3 || nickname > 20);
+}

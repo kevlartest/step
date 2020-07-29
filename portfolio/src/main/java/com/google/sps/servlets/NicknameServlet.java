@@ -64,6 +64,12 @@ public class NicknameServlet extends HttpServlet {
             return;
         }
 
+        nickname.trim(); // Make sure it's not blank
+        if(nickname.isEmpty() || nickname.length() < 3 || nickname.length() > 20){
+            System.err.println("Nickname length too short or long!");
+            return;
+        }
+
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Entity entity = new Entity("UserInfo", userId);
         entity.setProperty("id", userId);
