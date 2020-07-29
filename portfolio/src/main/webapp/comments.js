@@ -95,7 +95,7 @@ async function createCommentTimestampElement(secondsTimestamp){
 
     const timestampElement = document.createElement('span');
     timestampElement.className = 'commentTimestamp';
-    timestampElement.innerText = formattedTimestamp;
+    timestampElement.innerText = "<" + formattedTimestamp + ">";
 
     return timestampElement;
 }
