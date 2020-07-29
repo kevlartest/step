@@ -22,8 +22,12 @@ async function loadComments(amount){
     // Set dropdown to value, so on reloading they're not out of sync
     document.getElementById('comment-amount').value = commentsAmount;
 
-    const request = await fetch('/list-comments?amount=' + commentsAmount);
-    const comments = await request.json();
+    const comments = await (await fetch('/list-comments?amount=' + commentsAmount)).json()
+        .catch(e => {
+            alert("There was a problem fetching comments! Please refresh the page");
+            console.log(e);
+        });
+
     const commentListElement = document.getElementById('comments-list');
     commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
     comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment)));
