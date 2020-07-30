@@ -2,6 +2,7 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.sps.data.LoginData;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.annotation.WebServlet;
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 @WebServlet("/logindata")
-public class LoginData extends HttpServlet {
+public class LoginDataServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -19,10 +20,12 @@ public class LoginData extends HttpServlet {
 
     UserService userService = UserServiceFactory.getUserService();
 
-    final boolean isLoggedIn = userService.isUserLoggedIn();
-    final boolean isUserAdmin = isLoggedIn ? userService.isUserAdmin() : false;
-    final String userId = isLoggedIn ? userService.getCurrentUser().getUserId() : "";
+    final boolean loggedIn = userService.isUserLoggedIn();
+    final boolean isUserAdmin = loggedIn ? userService.isUserAdmin() : false;
+    final String userId = loggedIn ? userService.getCurrentUser().getUserId() : "";
 
-    response.getWriter().println("{ \"loggedIn\": " + isLoggedIn + ", \"userId\": \"" + userId + "\", \"isUserAdmin\": " + isUserAdmin + " }");
+    final LoginData loginData = new LoginData(loggedIn,userId,isUserAdmin);
+
+    response.getWriter().println(loginData.toJSON());
   }
 }
