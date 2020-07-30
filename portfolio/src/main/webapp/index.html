@@ -29,7 +29,30 @@
 
         <hr>
 
-        <div id="comment-form-div"></div>
+        <div id="login-form-div" hidden="true">
+            <p>Please <a class="loginURL" href="">login</a> to comment.</p>
+        </div>
+
+        <div id="nickname-form-div" hidden="true">
+            <p>Hello, <span class="userEmail"></span> (<a class="logoutURL" href="">Logout</a>)</p>
+            <p>Please set a nickname to comment:</p>
+            <form id="nickname-form" method="POST" action="/nickname">
+            <input name="nickname" id="nickname" onkeyup="validateNickname()"/>
+            <br><br>
+            <input id="nickname-submit-button" type="submit" disabled="true"/>
+            </form>
+        </div>
+
+        <div id="comment-form-div" hidden="true">
+            <h3>Hello <span class="nickname"></span>!</h3>
+            <form id="comment-form" action="/comments" method="POST">
+            <h3>Add a comment or <a class="logoutURL" href="">logout</a>:</h3>
+            <label for="body">Comment:</label>
+            <input type="text" id="body" name="body" onkeyup="validateComment()">
+            <br><br>
+            <input id="submit-button" type="submit" disabled="true"/>
+            </form>
+        </div>
 
         <hr>
         <h3>Comments</h3>

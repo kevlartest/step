@@ -112,7 +112,6 @@ async function createCommentNicknameElement(userId){
     try {
         const response = await (await fetch('/nickname?userId=' + userId)).json();
         nicknameElement.innerText = response.nickname;
-        console.log("Nickname", response);
     } catch (e){
         nicknameElement.innerText = "UNDEFINED";
         console.log("Failed to load nickname for " + userId);
@@ -137,15 +136,33 @@ function validateComment(){
     document.getElementById('submit-button').disabled = (bodyLength < MIN_COMMENT_LENGTH || bodyLength > MAX_COMMENT_LENGTH);
 }
 
-// Fetch comment form if user is logged in, otherwise ask to login
+/**
+ * Gets whether user has logged in and has a nickname
+ * Then shows correct form, and displays details accordingly
+ */
 async function doLogin(){
-    const formRequest = await fetch('/login');
-    const text = await formRequest.text();
-    var element = document.createElement('html');
-    element.innerHTML = text;
-    document.getElementById('comment-form-div').appendChild(element);
+    // Get login info in the form { loginURL, logoutURL, nickname, email }
+    const loginInfo = await(await fetch('/login')).json()
+        .catch(e => {
+            alert("There was a problem loading login info! Please refresh the page");
+            console.log(e);
+        });
 
-    getLoginData();
+    // Get the various forms
+    const login_form_div = document.getElementById('login-form-div');
+    const nickname_form_div = document.getElementById('nickname-form-div');
+    const comment_form_div = document.getElementById('comment-form-div');
+
+    // Only show the correct form based on whether user is logged in & has set nickname
+    login_form_div.hidden = !loginInfo.loginURL;
+    nickname_form_div.hidden = !loginInfo.email;
+    comment_form_div.hidden = !loginInfo.nickname;
+
+    // Replace occurences of the variables with values from the backend
+    Array.from(document.getElementsByClassName("loginURL")).forEach(e => e.setAttribute('href', loginInfo.loginURL));
+    Array.from(document.getElementsByClassName("logoutURL")).forEach(e => e.setAttribute('href', loginInfo.logoutURL));
+    Array.from(document.getElementsByClassName("nickname")).forEach(e => e.textContent = loginInfo.nickname);
+    Array.from(document.getElementsByClassName("userEmail")).forEach(e => e.textContent = loginInfo.email);
 }
 
 // Get whether user is logged in, and their userId

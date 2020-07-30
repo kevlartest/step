@@ -3,11 +3,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
+import com.google.gson.Gson;
 import com.google.sps.servlets.NicknameServlet;
 
 import java.io.IOException;
@@ -21,45 +17,40 @@ import javax.servlet.ServletException;
 @WebServlet("/login")
 public class CommentsForm extends HttpServlet {
 
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    response.setContentType("text/html;");
-    PrintWriter out = response.getWriter();
+    // Inner class to help send variables as Json
+    // null variables are ignored by Gson so only the set variables get sent
+    private static class GsonHelper {  
+        String loginURL;
+        String logoutURL;
+        String nickname;
+        String email;
+    }  
 
-    UserService userService = UserServiceFactory.getUserService();
-    if (!userService.isUserLoggedIn()) {
-        String loginUrl = userService.createLoginURL("/");
-        out.println("<p>Please <a href=\"" + loginUrl + "\">login</a> to comment.</p>");
-        return;
-    }
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        final UserService userService = UserServiceFactory.getUserService();
+        final CommentsForm.GsonHelper helperClass = new CommentsForm.GsonHelper();
 
-    final String logoutUrl = userService.createLogoutURL("/");
-    final User user = userService.getCurrentUser();
-    final String nickname = NicknameServlet.getUserNickname(user.getUserId());
+        if (!userService.isUserLoggedIn()) {
+            // Send login URL to display in login form
+            helperClass.loginURL = userService.createLoginURL("/");
+        } else {
+            // They're logged in, send logoutURL
+            helperClass.logoutURL = userService.createLogoutURL("/");
 
-    if (nickname.isEmpty()) {
-        out.println("<p>Hello, " + user.getEmail() + " (<a href =\"" + logoutUrl + "\">Logout</a>)</p>");
-        out.println("<p>Please set a nickname to comment:</p>");
-        out.println("<form id=\"nickname-form\" method=\"POST\" action=\"/nickname\">");
-        out.println("<input name=\"nickname\" id=\"nickname\" onkeyup=\"validateNickname()\"/>");
-        out.println("<br><br>");
-        out.println("<input id=\"nickname-submit-button\" type=\"submit\" disabled=\"true\"/>");
-        out.println("</form>");
+            final User user = userService.getCurrentUser();
+            final String nickname = NicknameServlet.getUserNickname(user.getUserId());
 
-        return;
-    }
+            if(nickname.isEmpty()){
+                // They don't have a nickname, send email to display in nickname form
+                helperClass.email = user.getEmail();
+            } else {
+                // They have a nickname, send over to display in comment form
+                helperClass.nickname = nickname;
+            }
+        }
 
-    String userId = user.getUserId();
-
-    // Show comment form
-    out.println("<h3>Hello " + nickname + "!</h3>");
-    out.println("<form id=\"comment-form\" action=\"/comments\" method=\"POST\">");
-    out.println("<h3>Add a comment or <a href=\"" + logoutUrl + "\">logout</a>:</h3>");
-    out.println("<label for=\"body\">Comment:</label>");
-    out.println("<input type=\"text\" id=\"body\" name=\"body\" onkeyup=\"validateComment()\">");
-    out.println("<br><br>");
-    out.println("<input id=\"submit-button\" type=\"submit\" disabled=\"true\"/>");
-    out.println("</form>");
-
+        response.setContentType("application/json;");
+        new Gson().toJson(helperClass, response.getWriter());
     }
 }
