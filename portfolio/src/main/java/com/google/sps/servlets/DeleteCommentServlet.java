@@ -28,6 +28,7 @@ public class DeleteCommentServlet extends HttpServlet {
         UserService userService = UserServiceFactory.getUserService();
         if(!userService.isUserLoggedIn()){
             System.err.println("User is not logged in!");
+            response.setStatus(401); // Unathenticated
             return;
         }
 
