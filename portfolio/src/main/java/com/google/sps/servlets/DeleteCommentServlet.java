@@ -46,6 +46,7 @@ public class DeleteCommentServlet extends HttpServlet {
         final String userId = userService.getCurrentUser().getUserId();
 
         if(!isUserAdmin && !commentUserId.equalsIgnoreCase(userId)){
+            response.setStatus(403); // Unauthorised
             System.err.println("User is not author or admin!");
             return;
         }
