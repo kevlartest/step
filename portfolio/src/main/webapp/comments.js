@@ -1,3 +1,8 @@
+const MIN_COMMENT_LENGTH = 15;
+const MAX_COMMENT_LENGTH = 2000;
+const MIN_NICKNAME_LENGTH = 3;
+const MAX_NICKNAME_LENGTH = 20;
+
 /**
  * Load comments from datastore and insert them in the webpage
  * @param {number} amount The maximum amount of comments to fetch and display
@@ -129,7 +134,7 @@ async function deleteComment(comment) {
 function validateComment(){
     const form = document.getElementById('comment-form');
     const bodyLength = form.body.value.length;
-    document.getElementById('submit-button').disabled = (bodyLength < 15 || bodyLength > 2000);
+    document.getElementById('submit-button').disabled = (bodyLength < MIN_COMMENT_LENGTH || bodyLength > MAX_COMMENT_LENGTH);
 }
 
 // Fetch comment form if user is logged in, otherwise ask to login
@@ -154,5 +159,5 @@ async function getLoginData(){
 function validateNickname(){
     const form = document.getElementById('nickname-form');
     const nickname = form.nickname.value.length;
-    document.getElementById('nickname-submit-button').disabled = (nickname < 3 || nickname > 20);
+    document.getElementById('nickname-submit-button').disabled = (nickname < MIN_NICKNAME_LENGTH || nickname > MAX_NICKNAME_LENGTH);
 }

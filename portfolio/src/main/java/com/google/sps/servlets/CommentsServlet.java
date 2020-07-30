@@ -35,7 +35,10 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/comments")
 public class CommentsServlet extends HttpServlet {
 
-  private Map<String,List<Comment>> comments;
+    private static final int MIN_COMMENT_LENGTH = 15;
+    private static final int MAX_COMMENT_LENGTH = 2000;
+
+    private Map<String,List<Comment>> comments;
 
     @Override
     public void init() {
@@ -73,7 +76,7 @@ public class CommentsServlet extends HttpServlet {
         body.trim();
 
         // Don't store a blank comment, or one where body isn't > 15 and < 2000 characters
-        if(userId.isEmpty() || body.isEmpty() || body.length() < 15 || body.length() > 2000){
+        if(userId.isEmpty() || body.isEmpty() || body.length() < MIN_COMMENT_LENGTH || body.length() > MAX_COMMENT_LENGTH){
             System.err.println("Comment userId or body are effectively empty!");
             return;
         }

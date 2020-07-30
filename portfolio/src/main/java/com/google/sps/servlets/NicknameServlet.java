@@ -31,6 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/nickname")
 public class NicknameServlet extends HttpServlet {
 
+    private static final int MIN_NICKNAME_LENGTH = 3;
+    private static final int MAX_NICKNAME_LENGTH = 20;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json;");
@@ -65,7 +68,7 @@ public class NicknameServlet extends HttpServlet {
         }
 
         nickname.trim(); // Make sure it's not blank
-        if(nickname.isEmpty() || nickname.length() < 3 || nickname.length() > 20){
+        if(nickname.isEmpty() || nickname.length() < MIN_NICKNAME_LENGTH || nickname.length() > MAX_NICKNAME_LENGTH){
             System.err.println("Nickname length too short or long!");
             return;
         }
