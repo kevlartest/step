@@ -155,7 +155,7 @@ async function getLoginData(){
     return await request.json();
 }
 
-// Disable nickname form if conditions are not met
+// Disable nickname form if length restrictions are not met
 function validateNickname(){
     const form = document.getElementById('nickname-form');
     const nickname = form.nickname.value.length;
