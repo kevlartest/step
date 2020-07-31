@@ -26,22 +26,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @WebServlet("/comments")
 public class CommentsServlet extends HttpServlet {
 
     private static final int MIN_COMMENT_LENGTH = 15;
     private static final int MAX_COMMENT_LENGTH = 2000;
-
-    private Map<String,List<Comment>> comments;
-
-    @Override
-    public void init() {
-        comments = new HashMap<>();
-    }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
