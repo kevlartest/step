@@ -30,14 +30,16 @@ public class Comment {
     /**
      * Create comment object from datastore Entity
      */
-    public Comment(Entity entity){
+    public Comment(Entity entity) {
         id = entity.getKey().getId();
         userId = (String) entity.getProperty("userId");
         body = (String) entity.getProperty("body");
         timestamp = Instant.parse((String) entity.getProperty("timestamp"));
-        final float sentimentScore = (float) entity.getProperty("sentimentScore");
-        final float sentimentMagnitude = (float) entity.getProperty("sentimentMagnitude");
-        sentiment = new Sentiment(sentimentScore,sentimentMagnitude);
+        final Double sentimentScoreEntity = (Double) entity.getProperty("sentimentScore");
+        final Double sentimentMagnitudeValue = (Double) entity.getProperty("sentimentMagnitude");
+        final float sentimentScore = sentimentScoreEntity == null ? 0 : sentimentScoreEntity.floatValue();
+        final float sentimentMagnitude = sentimentMagnitudeValue == null ? 0 : sentimentMagnitudeValue.floatValue();
+        sentiment = new Sentiment(sentimentScore, sentimentMagnitude);
     }
 
     public long getId(){
