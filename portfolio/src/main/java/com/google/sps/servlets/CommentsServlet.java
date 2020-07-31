@@ -46,8 +46,8 @@ public class CommentsServlet extends HttpServlet {
             return;
         }
 
-        final String userId = userService.getCurrentUser().getUserId();
-        final String body = request.getParameter("body");
+        String userId = userService.getCurrentUser().getUserId();
+        String body = request.getParameter("body");
 
         if(userId == null){
             System.err.println("Comment userId is null");
@@ -60,8 +60,8 @@ public class CommentsServlet extends HttpServlet {
         }
 
         // Trim strings to prevent submitting effectively empty fields
-        userId.trim();
-        body.trim();
+        userId = userId.trim();
+        body = body.trim();
 
         // Don't store a blank comment, or one where body isn't > 15 and < 2000 characters
         if(userId.isEmpty() || body.isEmpty() || body.length() < MIN_COMMENT_LENGTH || body.length() > MAX_COMMENT_LENGTH){

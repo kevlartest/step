@@ -51,7 +51,7 @@ public class NicknameServlet extends HttpServlet {
     }
 
     try {
-        final String nickname = request.getParameter("nickname");
+        String nickname = request.getParameter("nickname");
         final String userId = userService.getCurrentUser().getUserId();
 
         if(nickname == null){
@@ -63,7 +63,7 @@ public class NicknameServlet extends HttpServlet {
             return;
         }
 
-        nickname.trim(); // Make sure it's not blank
+        nickname = nickname.trim(); // Make sure it's not blank
         if(nickname.isEmpty() || nickname.length() < MIN_NICKNAME_LENGTH || nickname.length() > MAX_NICKNAME_LENGTH){
             System.err.println("Nickname length too short or long!");
             return;
