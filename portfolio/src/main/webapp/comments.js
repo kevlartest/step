@@ -32,15 +32,15 @@ async function loadComments(amount){
             await (await fetch('/list-comments?amount=' + commentsAmount)).json(),
             await getLoginData()
         ]);
+        console.log("Comments",comments);
+
+        const commentListElement = document.getElementById('comments-list');
+        commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
+        comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment, loginData)));
     } catch(e) {
         alert("There was a problem fetching comments! Please refresh the page");
         console.log(e);
     }
-
-
-    const commentListElement = document.getElementById('comments-list');
-    commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
-    comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment, loginData)));
 }
 
 /**
@@ -57,7 +57,7 @@ function createCommentElement(comment, loginData) {
 
     createCommentNicknameElement(comment.userId).then(e => commentHeading.insertAdjacentElement('afterbegin', e));
     createCommentTimestampElement(comment.timestamp.seconds).then(e => commentHeading.appendChild(e));
-    createCommentSentimentElement(comment.sentiment).then(e => commentHeading.appendChild(e));
+    createCommentSentimentElement(comment.sentiment,comment.body.length).then(e => commentHeading.appendChild(e));
 
     // Only show delete button if comment was made by logged-in user, or they're an admin
     if(loginData.isUserAdmin || (loginData.loggedIn && loginData.userId === comment.userId)){
@@ -123,7 +123,7 @@ async function createCommentNicknameElement(userId){
     return nicknameElement;    
 }
 
-async function createCommentSentimentElement(sentiment){
+async function createCommentSentimentElement(sentiment, length){
     const score = sentiment.score;
     const magnitude = sentiment.magnitude;
 
@@ -131,12 +131,25 @@ async function createCommentSentimentElement(sentiment){
     sentimentElement.className = 'commentSentiment';
 
     // Based on https://cloud.google.com/natural-language/docs/basics#interpreting_sentiment_analysis_values
+
+    // Magnitude is the sum of absolute values of each word
+    // Thus, a text with many emotional words will have a high magnitude
+    // However, we must divide by the length of the text
+    // The (* 10000 / 3) seems to give a rough percentage of the amount of text that is emotional words
+    // This is just a guess but it probably depends on the weights assigned to the words
+    const load = ((magnitude / length) * 10000 / 3).toPrecision(2);
+
     let value;
-    if(score === 0 && magnitude < 4) value = "Mixed";
-    else if(score < 0.1 && magnitude <= 0) value = "Neutral";
-    else if(score <= -0.6 && magnitude <= 4) value = "Negative";
-    else if(score >= 0.8 && magnitude >= 3) value = "Positive";
-    else value = "No idea";
+    // If a text has a low load, then it is probably neutral
+    if(load < 30) value = "[Neutral]";
+    else {
+        if(score > -0.2 && score < 0.3) value = "[Mixed]";
+        else if(score >= 0.3) value = "[Positive]";
+        else if(score <= -0.2) value = "[Negative]";
+        else value = "[?]";
+    }
+
+    console.log(score + " " + magnitude + " " + load);
 
     sentimentElement.innerText = value;
     return sentimentElement;
@@ -147,8 +160,7 @@ async function deleteComment(comment) {
     args.append('id', comment.id);
     const response = await fetch('/delete-comment', {method: 'POST', body: args})
 
-    if(response.status === 200) return;
-    else throw('There was a problem deleting the comment!');
+    if(response.status !== 200) throw('There was a problem deleting the comment!');
 }
 
 // Disable submit button if body length < 15 characters
