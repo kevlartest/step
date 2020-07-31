@@ -19,6 +19,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.sps.data.Comment;
+import com.google.sps.data.Sentiment;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -69,9 +70,18 @@ public class CommentsServlet extends HttpServlet {
         }
 
         final Instant timestamp = Instant.now();
+        final Sentiment sentiment;
+        try {
+            sentiment = Sentiment.getSentiment(body);
+        } catch (Exception e){
+            response.setStatus(500); // Internal server error
+            System.err.println("Something went wrong with the Natural Language library!");
+            e.printStackTrace();
+            return;
+        }
 
         // Comment instance here is only being used to convert the data using toDatastoreEntity()
-        final Comment comment = new Comment(userId,body,timestamp);
+        final Comment comment = new Comment(userId,body,timestamp, sentiment);
 
         try {
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
