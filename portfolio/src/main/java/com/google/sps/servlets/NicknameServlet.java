@@ -89,10 +89,6 @@ public class NicknameServlet extends HttpServlet {
     Query query = new Query("UserInfo").setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
     PreparedQuery results = datastore.prepare(query);
     Entity entity = results.asSingleEntity();
-    if (entity == null) {
-      return "";
-    }
-    String nickname = (String) entity.getProperty("nickname");
-    return nickname;
+    return (entity == null) ? "" : (String) entity.getProperty("nickname");
   }
 }
