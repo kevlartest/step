@@ -16,21 +16,19 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.sps.data.Comment;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @WebServlet("/comments")
 public class CommentsServlet extends HttpServlet {
@@ -49,12 +47,12 @@ public class CommentsServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // Bad request by default
-        response.setStatus(400);
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
         final UserService userService = UserServiceFactory.getUserService();
         if (!userService.isUserLoggedIn()) {
             System.err.println("User is not logged in!");
-            response.setStatus(401); // Unauthenticated
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
@@ -89,10 +87,10 @@ public class CommentsServlet extends HttpServlet {
         try {
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
             datastore.put(comment.toDatastoreEntity());
-            response.setStatus(200); // Successfully stored
+            response.setStatus(HttpServletResponse.SC_OK);
             response.sendRedirect("/index.html");
         } catch (Exception e){
-            response.setStatus(500); // Internal server error
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             System.err.println("There was an error storing the comment!");
             e.printStackTrace();
         }

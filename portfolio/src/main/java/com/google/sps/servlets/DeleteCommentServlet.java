@@ -1,18 +1,14 @@
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import java.io.IOException;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @WebServlet("/delete-comment")
 public class DeleteCommentServlet extends HttpServlet {
@@ -21,14 +17,14 @@ public class DeleteCommentServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     // Default to Bad Request
-    response.setStatus(400);
+    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
     response.setContentType("text/xml");
 
     try {
         UserService userService = UserServiceFactory.getUserService();
         if(!userService.isUserLoggedIn()){
             System.err.println("User is not logged in!");
-            response.setStatus(401); // Unathenticated
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
@@ -46,17 +42,17 @@ public class DeleteCommentServlet extends HttpServlet {
         final String userId = userService.getCurrentUser().getUserId();
 
         if(!isUserAdmin && !commentUserId.equalsIgnoreCase(userId)){
-            response.setStatus(403); // Unauthorised
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             System.err.println("User is not author or admin!");
             return;
         }
 
         datastore.delete(commentEntityKey);
-        response.setStatus(200); // Successfully deleted
+        response.setStatus(HttpServletResponse.SC_OK); // Successfully deleted
       } catch(Exception e){
             System.err.println("There was an error deleting the comment!");
             e.printStackTrace();
-            response.setStatus(500); // Internal server error
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
   }
 }
