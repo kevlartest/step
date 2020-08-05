@@ -160,7 +160,7 @@ async function deleteComment(comment) {
     args.append('id', comment.id);
     const response = await fetch('/delete-comment', {method: 'POST', body: args})
 
-    if(response.status !== 200) throw('There was a problem deleting the comment!');
+    if(!response.ok) throw('There was a problem deleting the comment!');
 }
 
 // Disable submit button if body length < 15 characters
@@ -192,7 +192,7 @@ async function doLogin(){
     nickname_form_div.hidden = !loginInfo.email;
     comment_form_div.hidden = !loginInfo.nickname;
 
-    // Replace occurences of the variables with values from the backend
+    // Replace occurrences of the variables with values from the backend
     Array.from(document.getElementsByClassName("loginURL")).forEach(e => e.setAttribute('href', loginInfo.loginURL));
     Array.from(document.getElementsByClassName("logoutURL")).forEach(e => e.setAttribute('href', loginInfo.logoutURL));
     Array.from(document.getElementsByClassName("nickname")).forEach(e => e.textContent = loginInfo.nickname);
