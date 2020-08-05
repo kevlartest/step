@@ -16,65 +16,70 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.sps.data.Comment;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.Instant;
 
 @WebServlet("/comments")
 public class CommentsServlet extends HttpServlet {
 
-  private Map<String,List<Comment>> comments;
+    private static final int MIN_COMMENT_LENGTH = 15;
+    private static final int MAX_COMMENT_LENGTH = 2000;
 
     @Override
-    public void init() {
-        comments = new HashMap<>();
-    }
-
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
         // Bad request by default
-        response.setStatus(400);
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-        final String email = request.getParameter("email");
-        final String body = request.getParameter("body");
-        if(email == null || body == null){
-            System.err.println("Comment email or body are null!");
+        final UserService userService = UserServiceFactory.getUserService();
+        if (!userService.isUserLoggedIn()) {
+            System.err.println("User is not logged in!");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        String userId = userService.getCurrentUser().getUserId();
+        String body = request.getParameter("body");
+
+        if(userId == null){
+            System.err.println("Comment userId is null");
+            return;
+        }
+
+        if(body == null){
+            System.err.println("Comment body is null");
             return;
         }
 
         // Trim strings to prevent submitting effectively empty fields
-        email.trim();
-        body.trim();
+        userId = userId.trim();
+        body = body.trim();
 
         // Don't store a blank comment, or one where body isn't > 15 and < 2000 characters
-        if(email.isEmpty() || body.isEmpty() || body.length() < 15 || body.length() > 2000){
-            System.err.println("Comment email or body are effectively empty!");
+        if(userId.isEmpty() || body.isEmpty() || body.length() < MIN_COMMENT_LENGTH || body.length() > MAX_COMMENT_LENGTH){
+            System.err.println("Comment userId or body are effectively empty!");
             return;
         }
 
         final Instant timestamp = Instant.now();
 
         // Comment instance here is only being used to convert the data using toDatastoreEntity()
-        final Comment comment = new Comment(email,body,timestamp);
+        final Comment comment = new Comment(userId,body,timestamp);
 
         try {
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
             datastore.put(comment.toDatastoreEntity());
-            response.setStatus(200); // Successfully stored
+            response.setStatus(HttpServletResponse.SC_OK);
             response.sendRedirect("/index.html");
         } catch (Exception e){
-            response.setStatus(500); // Internal server error
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             System.err.println("There was an error storing the comment!");
             e.printStackTrace();
         }

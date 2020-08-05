@@ -1,3 +1,8 @@
+const MIN_COMMENT_LENGTH = 15;
+const MAX_COMMENT_LENGTH = 2000;
+const MIN_NICKNAME_LENGTH = 3;
+const MAX_NICKNAME_LENGTH = 20;
+
 /**
  * Load comments from datastore and insert them in the webpage
  * @param {number} amount The maximum amount of comments to fetch and display
@@ -22,7 +27,10 @@ async function loadComments(amount){
     // Set dropdown to value, so on reloading they're not out of sync
     document.getElementById('comment-amount').value = commentsAmount;
 
-    const comments = await (await fetch('/list-comments?amount=' + commentsAmount)).json()
+    const [comments, loginData] = await Promise.all([
+        await (await fetch('/list-comments?amount=' + commentsAmount)).json(),
+         await getLoginData()
+        ])
         .catch(e => {
             alert("There was a problem fetching comments! Please refresh the page");
             console.log(e);
@@ -30,37 +38,46 @@ async function loadComments(amount){
 
     const commentListElement = document.getElementById('comments-list');
     commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
-    comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment)));
+    comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment, loginData)));
 }
 
 /**
  * Creates the HTML list element that contains a single comment, including author, timestamp, body and delete button
- * @param {Object} comment A comment as fetched from datastore, including email, body and timestamp
+ * @param {Object} comment A comment as fetched from datastore, including userId, body and timestamp
+ * @param {Object} loginData The user login data, i.e. whether they're logged in, an admin, and their userId
  * @return {HTMLLIElement} The HTML list element that contains the comment to be displayed
  */
-function createCommentElement(comment) {
+function createCommentElement(comment, loginData) {
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
 
-    // Convert UNIX seconds to milliseconds
-    const timestamp = new Date(comment.timestamp.seconds * 1000);
-    
-    // Long format the timestamp (e.g. Sunday 9 August 2020, 04:06)
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-    const formattedTimestamp = timestamp.toLocaleDateString('en-IE', options);
-
-    // Create a comment heading containing the email address and timestamp
     const commentHeading = document.createElement('p');
 
-    const emailElement = document.createElement('span');
-    emailElement.className = 'commentEmail';
-    emailElement.innerText = comment.email;
+    createCommentNicknameElement(comment.userId).then(e => commentHeading.insertAdjacentElement('afterbegin', e));
+    createCommentTimestampElement(comment.timestamp.seconds).then(e => commentHeading.appendChild(e));
 
-    const timestampElement = document.createElement('span');
-    timestampElement.className = 'commentTimestamp';
-    timestampElement.innerText = formattedTimestamp;
+    // Only show delete button if comment was made by logged-in user, or they're an admin
+    if(loginData.isUserAdmin || (loginData.loggedIn && loginData.userId === comment.userId)){
+        createCommentDeleteButtonElement(comment, commentElement).then(e => commentHeading.appendChild(e));
+    }
 
+    commentElement.appendChild(commentHeading);
+    createCommentBody(comment.body).then(e => commentElement.appendChild(e));
+
+    return commentElement;
+}
+
+async function createCommentBody(body){
+    const bodyElement = document.createElement('p');
+    bodyElement.className = 'commentBody';
+    bodyElement.innerText = body;
+
+    return bodyElement;
+}
+
+async function createCommentDeleteButtonElement(comment, commentElement){
     const deleteButtonElement = document.createElement('button');
+    deleteButtonElement.className = 'deleteButton';
     deleteButtonElement.innerText = 'Delete';
     deleteButtonElement.addEventListener('click', () => {
         deleteComment(comment)
@@ -70,20 +87,37 @@ function createCommentElement(comment) {
         })
         .catch(e => alert(e));
     });
+    return deleteButtonElement;
+}
 
-    commentHeading.appendChild(emailElement);
-    commentHeading.appendChild(timestampElement);
-    commentHeading.appendChild(deleteButtonElement);
+async function createCommentTimestampElement(secondsTimestamp){
+    // Convert UNIX seconds to milliseconds
+    const timestamp = new Date(secondsTimestamp * 1000);
+    
+    // Long format the timestamp (e.g. Sunday 9 August 2020, 04:06)
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    const formattedTimestamp = timestamp.toLocaleDateString('en-IE', options);
 
-    // Comment body with the actual text
-    const bodyElement = document.createElement('p');
-    bodyElement.className = 'commentBody';
-    bodyElement.innerText = comment.body;
+    const timestampElement = document.createElement('span');
+    timestampElement.className = 'commentTimestamp';
+    timestampElement.innerText = "<" + formattedTimestamp + ">";
 
-    commentElement.appendChild(commentHeading);
-    commentElement.appendChild(bodyElement);
+    return timestampElement;
+}
 
-    return commentElement;
+async function createCommentNicknameElement(userId){
+    const nicknameElement = document.createElement('span');
+    nicknameElement.className = 'commentNickname';
+
+    try {
+        const response = await (await fetch('/nickname?userId=' + userId)).json();
+        nicknameElement.innerText = response.nickname;
+    } catch (e){
+        nicknameElement.innerText = "UNDEFINED";
+        console.log("Failed to load nickname for " + userId);
+    }
+
+    return nicknameElement;    
 }
 
 async function deleteComment(comment) {
@@ -99,5 +133,48 @@ async function deleteComment(comment) {
 function validateComment(){
     const form = document.getElementById('comment-form');
     const bodyLength = form.body.value.length;
-    document.getElementById('submit-button').disabled = (bodyLength < 15 || bodyLength > 2000);
+    document.getElementById('submit-button').disabled = (bodyLength < MIN_COMMENT_LENGTH || bodyLength > MAX_COMMENT_LENGTH);
+}
+
+/**
+ * Gets whether user has logged in and has a nickname
+ * Then shows correct form, and displays details accordingly
+ */
+async function doLogin(){
+    // Get login info in the form { loginURL, logoutURL, nickname, email }
+    const loginInfo = await(await fetch('/login')).json()
+        .catch(e => {
+            alert("There was a problem loading login info! Please refresh the page");
+            console.log(e);
+        });
+
+    // Get the various forms
+    const login_form_div = document.getElementById('login-form-div');
+    const nickname_form_div = document.getElementById('nickname-form-div');
+    const comment_form_div = document.getElementById('comment-form-div');
+
+    // Only show the correct form based on whether user is logged in & has set nickname
+    login_form_div.hidden = !loginInfo.loginURL;
+    nickname_form_div.hidden = !loginInfo.email;
+    comment_form_div.hidden = !loginInfo.nickname;
+
+    // Replace occurences of the variables with values from the backend
+    Array.from(document.getElementsByClassName("loginURL")).forEach(e => e.setAttribute('href', loginInfo.loginURL));
+    Array.from(document.getElementsByClassName("logoutURL")).forEach(e => e.setAttribute('href', loginInfo.logoutURL));
+    Array.from(document.getElementsByClassName("nickname")).forEach(e => e.textContent = loginInfo.nickname);
+    Array.from(document.getElementsByClassName("userEmail")).forEach(e => e.textContent = loginInfo.email);
+}
+
+// Get whether user is logged in, and their userId
+// i.e. { "isLoggedIn": true, "userId": "39572937652947642" }
+async function getLoginData(){
+    const request = await fetch('/logindata');
+    return await request.json();
+}
+
+// Disable nickname form if length restrictions are not met
+function validateNickname(){
+    const form = document.getElementById('nickname-form');
+    const nickname = form.nickname.value.length;
+    document.getElementById('nickname-submit-button').disabled = (nickname < MIN_NICKNAME_LENGTH || nickname > MAX_NICKNAME_LENGTH);
 }

@@ -6,13 +6,13 @@ import com.google.appengine.api.datastore.Entity;
 
 public class Comment {
     private final long id;
-    private final String email;
+    private final String userId;
     private final String body;
     private final Instant timestamp;
 
-    public Comment(long id, String email, String body, Instant timestamp){
+    public Comment(long id, String userId, String body, Instant timestamp){
         this.id = id;
-        this.email = email;
+        this.userId = userId;
         this.body = body;
         this.timestamp = timestamp;
     }
@@ -20,9 +20,9 @@ public class Comment {
     /**
      * Constructor used when entity has not been persisted yet, and thus has no ID
      */
-    public Comment(String email, String body, Instant timestamp){
+    public Comment(String userId, String body, Instant timestamp){
         this.id = 0L;
-        this.email = email;
+        this.userId = userId;
         this.body = body;
         this.timestamp = timestamp;
     }
@@ -30,8 +30,8 @@ public class Comment {
     public long getId(){
         return id;
     }
-    public String getEmail(){
-        return email;
+    public String getUserId(){
+        return userId;
     }
     public String getBody(){
         return body;
@@ -46,7 +46,7 @@ public class Comment {
 
     public Entity toDatastoreEntity(){
         Entity entity = new Entity("Comment");
-        entity.setProperty("email", email);
+        entity.setProperty("userId", userId);
         entity.setProperty("body", body);
         entity.setProperty("timestamp", timestamp.toString());
 
