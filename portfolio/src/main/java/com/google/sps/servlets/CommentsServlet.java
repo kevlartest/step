@@ -74,7 +74,7 @@ public class CommentsServlet extends HttpServlet {
         try {
             sentiment = Sentiment.getSentiment(body);
         } catch (Exception e){
-            response.setStatus(500); // Internal server error
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             System.err.println("Something went wrong with the Natural Language library!");
             e.printStackTrace();
             return;
