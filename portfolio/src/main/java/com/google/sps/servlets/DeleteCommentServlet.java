@@ -8,13 +8,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @WebServlet("/delete-comment")
 public class DeleteCommentServlet extends HttpServlet {
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
     // Default to Bad Request
     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
