@@ -23,7 +23,7 @@ public class LoginDataServlet extends HttpServlet {
     final boolean isUserAdmin = loggedIn && userService.isUserAdmin();
     final String userId = loggedIn ? userService.getCurrentUser().getUserId() : "";
 
-    final LoginData loginData = new LoginData(loggedIn,userId,isUserAdmin);
+    final LoginData loginData = new LoginData(loggedIn, userId, isUserAdmin);
 
     response.getWriter().println(loginData.toJSON());
   }

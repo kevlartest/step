@@ -30,68 +30,71 @@ import java.time.Instant;
 @WebServlet("/comments")
 public class CommentsServlet extends HttpServlet {
 
-    private static final int MIN_COMMENT_LENGTH = 15;
-    private static final int MAX_COMMENT_LENGTH = 2000;
+  private static final int MIN_COMMENT_LENGTH = 15;
+  private static final int MAX_COMMENT_LENGTH = 2000;
 
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
-        // Bad request by default
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    // Bad request by default
+    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-        final UserService userService = UserServiceFactory.getUserService();
-        if (!userService.isUserLoggedIn()) {
-            System.err.println("User is not logged in!");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        String userId = userService.getCurrentUser().getUserId();
-        String body = request.getParameter("body");
-
-        if(userId == null){
-            System.err.println("Comment userId is null");
-            return;
-        }
-
-        if(body == null){
-            System.err.println("Comment body is null");
-            return;
-        }
-
-        // Trim strings to prevent submitting effectively empty fields
-        userId = userId.trim();
-        body = body.trim();
-
-        // Don't store a blank comment, or one where body isn't > 15 and < 2000 characters
-        if(userId.isEmpty() || body.isEmpty() || body.length() < MIN_COMMENT_LENGTH || body.length() > MAX_COMMENT_LENGTH){
-            System.err.println("Comment userId or body are effectively empty!");
-            return;
-        }
-
-        final Instant timestamp = Instant.now();
-        final Sentiment sentiment;
-        try {
-            sentiment = Sentiment.getSentiment(body);
-        } catch (Exception e){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            System.err.println("Something went wrong with the Natural Language library!");
-            e.printStackTrace();
-            return;
-        }
-
-        // Comment instance here is only being used to convert the data using toDatastoreEntity()
-        final Comment comment = new Comment(userId,body,timestamp, sentiment);
-
-        try {
-            DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-            datastore.put(comment.toDatastoreEntity());
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.sendRedirect("/index.html");
-        } catch (Exception e){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            System.err.println("There was an error storing the comment!");
-            e.printStackTrace();
-        }
+    final UserService userService = UserServiceFactory.getUserService();
+    if (!userService.isUserLoggedIn()) {
+      System.err.println("User is not logged in!");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      return;
     }
+
+    String userId = userService.getCurrentUser().getUserId();
+    String body = request.getParameter("body");
+
+    if (userId == null) {
+      System.err.println("Comment userId is null");
+      return;
+    }
+
+    if (body == null) {
+      System.err.println("Comment body is null");
+      return;
+    }
+
+    // Trim strings to prevent submitting effectively empty fields
+    userId = userId.trim();
+    body = body.trim();
+
+    // Don't store a blank comment, or one where body isn't > 15 and < 2000 characters
+    if (userId.isEmpty()
+        || body.isEmpty()
+        || body.length() < MIN_COMMENT_LENGTH
+        || body.length() > MAX_COMMENT_LENGTH) {
+      System.err.println("Comment userId or body are effectively empty!");
+      return;
+    }
+
+    final Instant timestamp = Instant.now();
+    final Sentiment sentiment;
+    try {
+      sentiment = Sentiment.getSentiment(body);
+    } catch (Exception e) {
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      System.err.println("Something went wrong with the Natural Language library!");
+      e.printStackTrace();
+      return;
+    }
+
+    // Comment instance here is only being used to convert the data using toDatastoreEntity()
+    final Comment comment = new Comment(userId, body, timestamp, sentiment);
+
+    try {
+      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+      datastore.put(comment.toDatastoreEntity());
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.sendRedirect("/index.html");
+    } catch (Exception e) {
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      System.err.println("There was an error storing the comment!");
+      e.printStackTrace();
+    }
+  }
 }
