@@ -32,7 +32,6 @@ async function loadComments(amount){
             await (await fetch('/list-comments?amount=' + commentsAmount)).json(),
             await getLoginData()
         ]);
-        console.log("Comments",comments);
 
         const commentListElement = document.getElementById('comments-list');
         commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
@@ -149,7 +148,7 @@ async function createCommentSentimentElement(sentiment, length){
         else value = "[?]";
     }
 
-    console.log(score + " " + magnitude + " " + load);
+    console.log("Comment sentiment score: " + score + ", magnitude: " + magnitude + ", load: " + load);
 
     sentimentElement.innerText = value;
     return sentimentElement;
