@@ -75,7 +75,7 @@ public class CommentsServlet extends HttpServlet {
     final Instant timestamp = Instant.now();
     final Sentiment sentiment;
     try {
-      sentiment = Sentiment.getSentiment(body);
+      sentiment = new Sentiment(body);
     } catch (Exception e) {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       System.err.println("Unable to get Sentiment!");
