@@ -159,7 +159,9 @@ async function deleteComment(comment) {
     args.append('id', comment.id);
     const response = await fetch('/delete-comment', {method: 'POST', body: args})
 
-    if(!response.ok) throw('There was a problem deleting the comment!');
+    if (response.status === 401) throw ('Please login to delete comments!');
+    else if (response.status === 403) throw ('You are not allowed to delete that comment!');
+    else if (!response.ok) throw('There was a problem deleting the comment!');
 }
 
 // Disable submit button if body length < 15 characters
