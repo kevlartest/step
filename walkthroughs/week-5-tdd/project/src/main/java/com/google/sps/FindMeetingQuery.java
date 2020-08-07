@@ -14,47 +14,84 @@
 
 package com.google.sps;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public final class FindMeetingQuery {
 
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    Collection<String> attendees = request.getAttendees();
-    // Get all events that have one of the attendees, and sort by event start time.
-    List<Event> attendeeEvents =
-            events.stream()
-                    .filter(e -> e.getAttendees().stream().anyMatch(attendees::contains))
-                    .sorted(ORDER_BY_EVENT_START)
-                    .collect(Collectors.toList());
 
-    // The list of viable time ranges for the meeting
-    final Collection<TimeRange> ranges = new ArrayList<>();
+    // Store all events each person has to go to
+    final Map<String, List<Event>> eventsPerPerson = new HashMap<>();
+    events.forEach(
+            event ->
+                    event
+                            .getAttendees()
+                            .forEach(
+                                    attendee ->
+                                            eventsPerPerson
+                                                    .computeIfAbsent(attendee, s -> new ArrayList<>())
+                                                    .add(event)));
+
+    // Get all events for the required attendees, and sort them by event start time
+    final Collection<Event> requiredAttendeeEvents = new TreeSet<>(ORDER_BY_EVENT_START);
+    request
+            .getAttendees()
+            .forEach(
+                    attendee ->
+                            requiredAttendeeEvents.addAll(
+                                    eventsPerPerson.getOrDefault(attendee, Collections.emptyList())));
+
+    // Get all events for required and optional attendees, and sort them by event start time
+    final Collection<Event> allAttendeeEvents = new TreeSet<>(ORDER_BY_EVENT_START);
+    allAttendeeEvents.addAll(requiredAttendeeEvents);
+    request
+            .getOptionalAttendees()
+            .forEach(
+                    attendee ->
+                            allAttendeeEvents.addAll(
+                                    eventsPerPerson.getOrDefault(attendee, Collections.emptyList())));
+
     final int requestedDuration = ((int) request.getDuration());
+    // The list of viable time ranges for the meeting, including optional attendees
+    Collection<TimeRange> ranges = checkRanges(allAttendeeEvents, requestedDuration);
+    System.out.println("ranges size: " + ranges.size());
+    if (ranges.size() > 0) return ranges;
 
+    return checkRanges(requiredAttendeeEvents, requestedDuration);
+  }
+
+  /**
+   * Finds all time ranges in which a meeting can be scheduled
+   *
+   * @param events      The set of events, sorted by start time, of all required participants
+   * @param minDuration The minimum duration time of the meeting
+   * @return The set of time ranges in which the meeting can be scheduled
+   */
+  private Collection<TimeRange> checkRanges(Collection<Event> events, int minDuration) {
+    final Collection<TimeRange> ranges = new ArrayList<>();
     // Start trying to schedule a meeting at the start of the day
     int start = TimeRange.START_OF_DAY;
-    int end = start; // End of the current event. Assume not events at first
+    int end = start; // End of the current event. Assume no events at first
 
     // Run through the events in order, checking if there is enough time in-between for a meeting
-    for (Event event : attendeeEvents) {
+    for (Event event : events) {
       final TimeRange eventRange = event.getWhen();
       final int eventStart = eventRange.start();
       final int eventEnd = eventRange.end();
 
       final TimeRange tentativeRange = TimeRange.fromStartEnd(start, eventStart, false);
-      if (checkViability(tentativeRange, requestedDuration)) ranges.add(tentativeRange);
+      if (checkViability(tentativeRange, minDuration)) ranges.add(tentativeRange);
 
-      start = Math.max(eventEnd, end); // Set new potential start to whichever meeting ends later
+      start =
+              Math.max(
+                      start,
+                      Math.max(eventEnd, end)); // Set new potential start to whichever meeting ends later
       end = eventEnd;
     }
 
     // At the end, check if we can go from end of last meeting to end of day:
     final TimeRange tentativeRange = TimeRange.fromStartEnd(start, TimeRange.END_OF_DAY, true);
-    if (checkViability(tentativeRange, requestedDuration)) ranges.add(tentativeRange);
+    if (checkViability(tentativeRange, minDuration)) ranges.add(tentativeRange);
 
     return ranges;
   }
@@ -62,7 +99,7 @@ public final class FindMeetingQuery {
   /**
    * Check if a meeting of a minimum duration can be scheduled between gives times
    *
-   * @param range       The potential range of time for the meeting
+   * @param range The potential range of time for the meeting
    * @param minDuration The minimum duration for the meeting
    * @return Whether a meeting of at least {@code minDuration} can be scheduled within given times
    */
