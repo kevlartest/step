@@ -27,18 +27,19 @@ async function loadComments(amount){
     // Set dropdown to value, so on reloading they're not out of sync
     document.getElementById('comment-amount').value = commentsAmount;
 
-    const [comments, loginData] = await Promise.all([
-        await (await fetch('/list-comments?amount=' + commentsAmount)).json(),
-         await getLoginData()
-        ])
-        .catch(e => {
-            alert("There was a problem fetching comments! Please refresh the page");
-            console.log(e);
-        });
+    try {
+        const [comments, loginData] = await Promise.all([
+            await (await fetch('/list-comments?amount=' + commentsAmount)).json(),
+            await getLoginData()
+        ]);
 
-    const commentListElement = document.getElementById('comments-list');
-    commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
-    comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment, loginData)));
+        const commentListElement = document.getElementById('comments-list');
+        commentListElement.textContent = ''; // Remove all comments before re-adding specified amount
+        comments.forEach((comment) => commentListElement.appendChild(createCommentElement(comment, loginData)));
+    } catch(e) {
+        alert("There was a problem fetching comments! Please refresh the page");
+        console.log(e);
+    }
 }
 
 /**
@@ -55,6 +56,7 @@ function createCommentElement(comment, loginData) {
 
     createCommentNicknameElement(comment.userId).then(e => commentHeading.insertAdjacentElement('afterbegin', e));
     createCommentTimestampElement(comment.timestamp.seconds).then(e => commentHeading.appendChild(e));
+    createCommentSentimentElement(comment.sentiment,comment.body.length).then(e => commentHeading.appendChild(e));
 
     // Only show delete button if comment was made by logged-in user, or they're an admin
     if(loginData.isUserAdmin || (loginData.loggedIn && loginData.userId === comment.userId)){
@@ -120,13 +122,49 @@ async function createCommentNicknameElement(userId){
     return nicknameElement;    
 }
 
+async function createCommentSentimentElement(sentiment, length){
+    const score = sentiment.score;
+    const magnitude = sentiment.magnitude;
+
+    const sentimentElement = document.createElement('span');
+    sentimentElement.className = 'commentSentiment';
+
+    // Based on https://cloud.google.com/natural-language/docs/basics#interpreting_sentiment_analysis_values
+
+    // Magnitude is the sum of absolute values of each word
+    // Thus, a text with many emotional words will have a high magnitude
+    // However, we must divide by the length of the text
+    // The (* 10000 / 3) seems to give a rough percentage of the amount of text that is emotional words
+    // This is just a guess but it probably depends on the weights assigned to the words
+    const load = ((magnitude / length) * 10000 / 3);
+
+    let value;
+
+    // If there's no values then the comment didn't get analysed
+    if (score === 0 && magnitude === 0) value = "";
+    // If a text has a low load, then it is probably neutral
+    else if (load < 30) value = "[Neutral]";
+    else {
+        if (score > -0.2 && score < 0.3) value = "[Mixed]";
+        else if (score >= 0.3) value = "[Positive]";
+        else if (score <= -0.2) value = "[Negative]";
+        else value = "[?]";
+    }
+
+    console.log("Comment sentiment score: " + score + ", magnitude: " + magnitude + ", load: " + load);
+
+    sentimentElement.innerText = value;
+    return sentimentElement;
+}
+
 async function deleteComment(comment) {
     const args = new URLSearchParams();
     args.append('id', comment.id);
     const response = await fetch('/delete-comment', {method: 'POST', body: args})
 
-    if(response.status === 200) return;
-    else throw('There was a problem deleting the comment!');
+    if (response.status === 401) throw ('Please login to delete comments!');
+    else if (response.status === 403) throw ('You are not allowed to delete that comment!');
+    else if (!response.ok) throw('There was a problem deleting the comment!');
 }
 
 // Disable submit button if body length < 15 characters
@@ -158,7 +196,7 @@ async function doLogin(){
     nickname_form_div.hidden = !loginInfo.email;
     comment_form_div.hidden = !loginInfo.nickname;
 
-    // Replace occurences of the variables with values from the backend
+    // Replace occurrences of the variables with values from the backend
     Array.from(document.getElementsByClassName("loginURL")).forEach(e => e.setAttribute('href', loginInfo.loginURL));
     Array.from(document.getElementsByClassName("logoutURL")).forEach(e => e.setAttribute('href', loginInfo.logoutURL));
     Array.from(document.getElementsByClassName("nickname")).forEach(e => e.textContent = loginInfo.nickname);
