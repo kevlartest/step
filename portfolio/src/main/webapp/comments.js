@@ -136,15 +136,18 @@ async function createCommentSentimentElement(sentiment, length){
     // However, we must divide by the length of the text
     // The (* 10000 / 3) seems to give a rough percentage of the amount of text that is emotional words
     // This is just a guess but it probably depends on the weights assigned to the words
-    const load = ((magnitude / length) * 10000 / 3).toPrecision(2);
+    const load = ((magnitude / length) * 10000 / 3);
 
     let value;
+
+    // If there's no values then the comment didn't get analysed
+    if (score === 0 && magnitude === 0) value = "";
     // If a text has a low load, then it is probably neutral
-    if(load < 30) value = "[Neutral]";
+    else if (load < 30) value = "[Neutral]";
     else {
-        if(score > -0.2 && score < 0.3) value = "[Mixed]";
-        else if(score >= 0.3) value = "[Positive]";
-        else if(score <= -0.2) value = "[Negative]";
+        if (score > -0.2 && score < 0.3) value = "[Mixed]";
+        else if (score >= 0.3) value = "[Positive]";
+        else if (score <= -0.2) value = "[Negative]";
         else value = "[?]";
     }
 
