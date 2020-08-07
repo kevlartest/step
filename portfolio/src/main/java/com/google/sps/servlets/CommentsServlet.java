@@ -65,26 +65,34 @@ public class CommentsServlet extends HttpServlet {
 
     // Don't store a blank comment, or one where body isn't > 15 and < 2000 characters
     if (userId.isEmpty()
-        || body.isEmpty()
-        || body.length() < MIN_COMMENT_LENGTH
-        || body.length() > MAX_COMMENT_LENGTH) {
+            || body.isEmpty()
+            || body.length() < MIN_COMMENT_LENGTH
+            || body.length() > MAX_COMMENT_LENGTH) {
       System.err.println("Comment userId or body are effectively empty!");
       return;
     }
 
     final Instant timestamp = Instant.now();
     final Sentiment sentiment;
+    Comment comment = null;
+
     try {
       sentiment = new Sentiment(body);
+      // Comment instance here is only being used to convert the data using toDatastoreEntity()
+      comment = new Comment(userId, body, timestamp, sentiment);
     } catch (Exception e) {
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
       System.err.println("Unable to get Sentiment!");
       e.printStackTrace();
+    }
+
+    if (comment == null) {
+      System.err.println("Comment object is null!");
       return;
     }
 
-    // Comment instance here is only being used to convert the data using toDatastoreEntity()
-    final Comment comment = new Comment(userId, body, timestamp, sentiment);
+    // If sentiment analysis fails, the Sentiment values will be set to 0;
+    // proceed to store the comment anyway.
 
     try {
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

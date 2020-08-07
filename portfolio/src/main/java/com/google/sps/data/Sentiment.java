@@ -6,16 +6,21 @@ import com.google.cloud.language.v1.LanguageServiceClient;
 import java.io.IOException;
 
 public class Sentiment {
-  private final float score;
-  private final float magnitude;
+  private float score = 0;
+  private float magnitude = 0;
 
-  public Sentiment(float score, float magnitude) {
+  private void setSentiment(float score, float magnitude) {
     this.score = score;
     this.magnitude = magnitude;
   }
 
+  public Sentiment(float score, float magnitude) {
+    setSentiment(score, magnitude);
+  }
+
   /**
    * Calculates sentiment for the given piece of text
+   * This consists of a score and a magnitude
    *
    * @param text The piece of text to apply sentiment analysis on
    */
@@ -28,9 +33,7 @@ public class Sentiment {
     final float score = sentiment.getScore();
     final float magnitude = sentiment.getMagnitude();
     languageService.close();
-
-    this.score = score;
-    this.magnitude = magnitude;
+    setSentiment(score,magnitude);
   }
 
   public float getScore() {
