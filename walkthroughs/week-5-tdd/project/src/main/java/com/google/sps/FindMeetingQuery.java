@@ -61,7 +61,6 @@ public final class FindMeetingQuery {
     final int requestedDuration = ((int) request.getDuration());
     // The list of viable time ranges for the meeting, including optional attendees
     Collection<TimeRange> ranges = checkRanges(allAttendeeEvents, requestedDuration);
-    System.out.println("ranges size: " + ranges.size());
     if (ranges.size() > 0) return ranges;
 
     return checkRanges(requiredAttendeeEvents, requestedDuration);
