@@ -25,9 +25,21 @@ import java.util.TreeSet;
 
 public final class FindMeetingQuery {
 
+  /**
+   * Find and return a set of time ranges in which a meeting can be scheduled.
+   *
+   * <p>This operation is O(A + B*log(B) + E), where A is total amount of attendees across all
+   * events, B is the total amount of optional and required attendees for the meeting, and E is the
+   * total amount of events.
+   *
+   * @param events  The set of events the potential attendees have to attend on the chosen day
+   * @param request The meeting details, including attendees and duration
+   * @return The set of time ranges in which the meeting can be scheduled
+   */
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
 
     // Store all events each person has to go to
+    // This operation is O(N) where N is the sum of the amount of attendees for all events
     final Map<String, List<Event>> eventsPerPerson = new HashMap<>();
     events.forEach(
             event ->
@@ -39,7 +51,9 @@ public final class FindMeetingQuery {
                                                     .computeIfAbsent(attendee, s -> new ArrayList<>())
                                                     .add(event)));
 
-    // Get all events for the required attendees, and sort them by event start time
+    // Get all events for the required attendees, and sort them by event start time.
+    // This operation is O(N*log(N)) where N is the total number of attendees for the meeting
+    // and log(N) is the guaranteed performance for an insertion into a TreeSet
     final Collection<Event> requiredAttendeeEvents = new TreeSet<>(ORDER_BY_EVENT_START);
     request
             .getAttendees()
@@ -49,6 +63,8 @@ public final class FindMeetingQuery {
                                     eventsPerPerson.getOrDefault(attendee, Collections.emptyList())));
 
     // Get all events for required and optional attendees, and sort them by event start time
+    // This operation is O(N*log(N)) where N is the total number of optional attendees for the
+    // meeting and log(N) is the guaranteed performance for an insertion into a TreeSet
     final Collection<Event> allAttendeeEvents = new TreeSet<>(ORDER_BY_EVENT_START);
     allAttendeeEvents.addAll(requiredAttendeeEvents);
     request
@@ -67,9 +83,11 @@ public final class FindMeetingQuery {
   }
 
   /**
-   * Finds all time ranges in which a meeting can be scheduled
+   * Finds all time ranges in which a meeting can be scheduled.
    *
-   * @param events      The set of events, sorted by start time, of all required participants
+   * <p>This operation is O(N) where N is the amount of events
+   *
+   * @param events The set of events, sorted by start time, of all required participants
    * @param minDuration The minimum duration time of the meeting
    * @return The set of time ranges in which the meeting can be scheduled
    */
@@ -103,7 +121,7 @@ public final class FindMeetingQuery {
   }
 
   /**
-   * Check if a meeting of a minimum duration can be scheduled between gives times
+   * Check if a meeting of a minimum duration can be scheduled between gives times.
    *
    * @param range The potential range of time for the meeting
    * @param minDuration The minimum duration for the meeting
