@@ -58,7 +58,7 @@ public final class FindMeetingQuery {
                             allAttendeeEvents.addAll(
                                     eventsPerPerson.getOrDefault(attendee, Collections.emptyList())));
 
-    final int requestedDuration = ((int) request.getDuration());
+    final int requestedDuration = Math.toIntExact(request.getDuration());
     // The list of viable time ranges for the meeting, including optional attendees
     Collection<TimeRange> ranges = checkRanges(allAttendeeEvents, requestedDuration);
     if (ranges.size() > 0) return ranges;
