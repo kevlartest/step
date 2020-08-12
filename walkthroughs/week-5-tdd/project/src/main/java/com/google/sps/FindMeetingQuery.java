@@ -105,10 +105,8 @@ public final class FindMeetingQuery {
       final TimeRange tentativeRange = TimeRange.fromStartEnd(start, eventStart, false);
       if (checkViability(tentativeRange, minDuration)) ranges.add(tentativeRange);
 
-      start =
-              Math.max(
-                      start,
-                      Math.max(eventEnd, end)); // Set new potential start to whichever meeting ends later
+      // Set new potential start to whichever meeting ends later
+      start = Math.max(start, Math.max(eventEnd, end));
       end = eventEnd;
     }
 
