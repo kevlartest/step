@@ -41,15 +41,14 @@ public final class FindMeetingQuery {
     // Store all events each person has to go to
     // This operation is O(N) where N is the sum of the amount of attendees for all events
     final Map<String, List<Event>> eventsPerPerson = new HashMap<>();
-    events.forEach(
-            event ->
-                    event
-                            .getAttendees()
-                            .forEach(
-                                    attendee ->
-                                            eventsPerPerson
-                                                    .computeIfAbsent(attendee, s -> new ArrayList<>())
-                                                    .add(event)));
+
+    // Run through all events, for each event get all attendees,
+    // for each attendee add to the relevant list in the map
+    for (Event event : events) {
+      for (String attendee : event.getAttendees()) {
+        eventsPerPerson.computeIfAbsent(attendee, k -> new ArrayList<>()).add(event);
+      }
+    }
 
     // Get all events for the required attendees, and sort them by event start time.
     // This operation is O(N*log(N)) where N is the total number of attendees for the meeting
